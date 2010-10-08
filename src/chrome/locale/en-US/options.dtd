@@ -1,0 +1,20 @@
+<!ENTITY prefwindow.title "AppLauncher preferences">
+<!ENTITY pane1.title "AppLauncher preferences">
+<!ENTITY checkboolpref.label "A Boolean Preference">
+<!ENTITY checkboolpref.accesskey "B">
+<!ENTITY intpref.label "An Integer Preference">
+<!ENTITY intpref.accesskey "I">
+<!ENTITY stringpref.label "A String Preference">
+<!ENTITY stringpref.accesskey "S">
+
+<!-- 設定画面の右側のボタン -->
+<!ENTITY prefitem.del "delete">
+<!ENTITY prefitem.add "add">
+<!ENTITY prefitem.edt "edit">
+<!ENTITY prefitem.mvu "move up">
+<!ENTITY prefitem.mvd "move down">
+
+<!-- リストのヘッダ -->
+<!ENTITY prefitem.header.name "Name">
+<!ENTITY prefitem.header.path "Path">
+<!ENTITY prefitem.header.args "Arguments">

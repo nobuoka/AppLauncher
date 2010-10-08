@@ -1,0 +1,20 @@
+<!ENTITY prefwindow.title "AppLauncher の設定">
+<!ENTITY pane1.title "AppLauncher 設定">
+<!ENTITY checkboolpref.label "真偽値の設定">
+<!ENTITY checkboolpref.accesskey "B">
+<!ENTITY intpref.label "整数値の設定">
+<!ENTITY intpref.accesskey "I">
+<!ENTITY stringpref.label "文字列の設定">
+<!ENTITY stringpref.accesskey "S">
+
+<!-- 設定画面の右側のボタン -->
+<!ENTITY prefitem.del "削除">
+<!ENTITY prefitem.add "追加">
+<!ENTITY prefitem.edt "編集">
+<!ENTITY prefitem.mvu "上に移動">
+<!ENTITY prefitem.mvd "下に移動">
+
+<!-- リストのヘッダ -->
+<!ENTITY prefitem.header.name "名称">
+<!ENTITY prefitem.header.path "Path">
+<!ENTITY prefitem.header.args "引数">

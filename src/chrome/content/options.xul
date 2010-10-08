@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://applauncher/skin/options.css" type="text/css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://applauncher/locale/options.dtd">
+<!--
+  設定ダイアログ
+    cf. dialog について: https://developer.mozilla.org/ja/XUL_Tutorial/Creating_Dialogs
+  変更内容: 
+    ver.0.5: "edit", "delete" などのボタンを追加. 配置を調整.
+-->
+<dialog id="info.vividcode.applauncher.prefwindow" title="&prefwindow.title;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        buttons="accept,cancel">
+  <!-- JavaScript を読み込み -->
+  <!--<script type="application/x-javascript" src="chrome://applauncher/content/AppLauncher.js" />-->
+  <script src="chrome://applauncher/locale/applauncher.js"/>
+  <script src="applauncher.js"/>
+  <script src="chrome://applauncher/locale/options.js"/>
+  <script src="options.js"/>
+  <!-- 実際の表示を規定 -->
+  <vbox>
+    
+    <hbox>
+      
+      <listbox flex="1" id="info.vividcode.ext.applauncher.prefwindow.listbox">
+        <listhead>
+          <listheader label="&prefitem.header.name;" />
+          <listheader label="&prefitem.header.path;" />
+          <listheader label="&prefitem.header.args;" />
+        </listhead>
+        <listcols>
+          <listcol/>
+          <listcol flex="1"/>
+          <listcol flex="1"/>
+        </listcols>
+        <!--
+        <listitem>
+          <listcell label="George"/>
+          <listcell label="House Painter"/>
+          <listcell label="House Painter"/>
+        </listitem>
+        -->
+      </listbox>
+      
+      <vbox>
+        <button label="&prefitem.edt;" accesskey="E" id="info.vividcode.ext.applauncher.prefwindow.button.edt" />
+        <button label="&prefitem.del;" accesskey="D" id="info.vividcode.ext.applauncher.prefwindow.button.del" />
+        <button label="&prefitem.mvu;" accesskey="U" id="info.vividcode.ext.applauncher.prefwindow.button.mvu" />
+        <button label="&prefitem.mvd;" accesskey="O" id="info.vividcode.ext.applauncher.prefwindow.button.mvd" />
+        <button label="&prefitem.add;" accesskey="A" id="info.vividcode.ext.applauncher.prefwindow.button.add" />
+      </vbox>
+      
+    </hbox>
+    
+    <!--
+    <groupbox>
+      <caption label="adding your application" />
+      <vbox>
+        <grid>
+          <columns>
+            <column />
+            <column flex="1" />
+          </columns>
+          <rows>
+            <row>
+              <label control="info.vividcode.applauncher.prefwindow.adding.name" value="Name" />
+              <textbox id="info.vividcode.applauncher.prefwindow.adding.name" />
+            </row>
+            <row>
+              <label control="info.vividcode.applauncher.prefwindow.adding.path" value="Path" />
+              <hbox>
+                <textbox id="info.vividcode.applauncher.prefwindow.adding.path" flex="1" />
+                <button label="select" id="info.vividcode.applauncher.prefwindow.adding.selectButton" />
+              </hbox>
+            </row>
+            <row>
+              <label control="info.vividcode.applauncher.prefwindow.adding.args" value="Arguments" />
+              <textbox id="info.vividcode.applauncher.prefwindow.adding.args" />
+            </row>
+          </rows>
+        </grid>
+        <hbox>
+          <spacer flex="1" />
+          <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />
+        </hbox>
+      </vbox>
+      -->
+      <!--
+      <vbox align="right">
+        <hbox align="center">
+          <label control="info.vividcode.applauncher.prefwindow.adding.name" value="Name" />
+          <textbox id="info.vividcode.applauncher.prefwindow.adding.name" />
+        </hbox>
+        <hbox align="center">
+          <label control="info.vividcode.applauncher.prefwindow.adding.path" value="Path" />
+          <textbox id="info.vividcode.applauncher.prefwindow.adding.path" />
+        </hbox>
+        <hbox align="center">
+          <label control="info.vividcode.applauncher.prefwindow.adding.args" value="Arguments" />
+          <textbox id="info.vividcode.applauncher.prefwindow.adding.args" />
+        </hbox>
+        <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />
+      </vbox>
+    </groupbox>
+      -->
+  </vbox>
+</dialog>

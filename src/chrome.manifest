@@ -1,0 +1,17 @@
+# "chrome.manifest"
+# http://www.kis-lab.com/serikashiki/FF/FF03.html
+
+# パッケージの定義
+# 下記形式で記述する.
+# content [packagename] [path/to/files]
+# locale  [packagename] [localename] [path/to/files]
+# skin    [packagename] [skinname]   [path/to/files]
+content   applauncher                 chrome/content/
+#              => "content" ディレクトリに "chrome://applauncher/content" という
+#                 パスでアクセスできるようになる.
+skin      applauncher   classic/1.0   chrome/skin/
+locale    applauncher   en-US         chrome/locale/en-US/
+locale    applauncher   ja-JP         chrome/locale/ja-JP/
+
+# 他のパッケージのオーバーレイ
+overlay   chrome://browser/content/browser.xul   chrome://applauncher/content/ff-overlay.xul

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Install Manifests の説明 : https://developer.mozilla.org/ja/Install_Manifests -->
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+    
+    <!-- 拡張機能を一意に識別するための ID. メールアドレス形式か GUID 形式 -->
+    <em:id>applauncher@vividcode.info</em:id>
+    <!-- アドオンのタイプ. 拡張機能であれば 2 -->
+    <em:type>2</em:type>
+    <!-- 拡張機能の名前 -->
+    <em:name>AppLauncher</em:name>
+    <!-- 拡張機能のバージョン. 規則あり -->
+    <!-- https://developer.mozilla.org/ja/Toolkit_version_format 参考？ -->
+    <em:version>0.8.0.ex100922a</em:version>
+    <!-- 拡張機能の説明 -->
+    <em:description>This extension lets you launch an external application via context menu.</em:description>
+    <!-- 拡張機能の開発者 -->
+    <em:creator>nobuoka</em:creator>
+    <!-- 共同開発者？ -->
+    <!--<em:contributor></em:contributor>-->
+    <!-- 拡張機能を配布したりするための web ページアドレス -->
+    <!--<em:homepageURL>http://www.vividcode.info/projects/applauncher/</em:homepageURL>-->
+    <!-- 拡張機能の設定に関する XUL ファイル. 無くても良い -->
+    <em:optionsURL>chrome://applauncher/content/options.xul</em:optionsURL>
+    <!-- 更新情報を確認するための RDF のパス -->
+    <em:updateURL>http://www.vividcode.info/projects/applauncher/update.rdf</em:updateURL>
+    <!-- 更新情報の RDF データのセキュリティを保証するための電子署名のための公開鍵. バージョンアップ時に変更する必要はない -->
+    <em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAGVzQgcjj+YncZI
+                  YjR1IQNEylmT3suHmbDp8WAF+HXn0jIjKukd1qOBLKX42z9Ozj2PX0
+                  3xMCCSdABI9z5DikA+3NWceUwHWENxQIMiCMN8XzqpBqhTS7MNX6M2
+                  OBHPSYfH1+OoaTsXAr5vrpy6GEuoEvWI+tbvUYZYaWNi4pEwIDAQAB</em:updateKey>
+    
+    <!-- 各地域の言語情報. 無くても良い -->
+    <em:localized>
+      <Description>
+        <em:locale>ja-JP</em:locale>
+        <em:name>AppLauncher</em:name>
+        <em:description>この拡張機能を使うと、コンテキストメニューから外部アプリケーションを起動できます。</em:description>
+        <em:creator>nobuoka</em:creator>
+        <em:homepageURL>http://www.vividcode.info/projects/applauncher/</em:homepageURL>
+      </Description>
+    </em:localized>
+    
+    <!-- 拡張機能の対応アプリケーション. 下の例では Firefox 3.0 - 3.6.* に対応 -->
+    <!-- cf. https://addons.mozilla.org/ja/firefox/pages/appversions/ -->
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox -->
+        <em:minVersion>3.0</em:minVersion>
+        <em:maxVersion>3.6.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+    
+  </Description>
+</RDF>

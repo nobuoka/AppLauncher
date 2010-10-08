@@ -1,136 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
-<!DOCTYPE prefwindow SYSTEM "chrome://applauncher/locale/options_dialog.dtd">
-<!--<?xml-stylesheet href="chrome://applauncher/content/prefs.css" type="text/css"?>-->
-<!--
-  設定ダイアログ
-    cf. dialog について: https://developer.mozilla.org/ja/XUL_Tutorial/Creating_Dialogs
-    cf. dialog のサンプル: https://developer.mozilla.org/ja/Code_snippets/Dialogs
-  変更内容: 
-    ver.0.6: 新たに作成.
--->
-<dialog id="info.vividcode.applauncher.pref.dialog" title="&dialog.title;"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        buttons="accept,cancel">
-  <!-- JavaScript を読み込み -->
-  <!--<script type="application/x-javascript" src="chrome://applauncher/content/AppLauncher.js" />-->
-  <!--<script type="application/x-javascript" src="chrome://applauncher/content/PrefsManager.js" />-->
-  <script type="application/x-javascript">
-  <![CDATA[
-  try {
-      // 初期化関数をロード時に実行する
-      (function() {
-          //var manager = new info.vividcode.ext.applauncher.PrefsManager();
-          /**
-           * ファイル選択用ダイアログ
-           */
-          var fileSelect = function() {
-              var nsIFilePicker = Components.interfaces.nsIFilePicker;
-              var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-              fp.init( window, "Select an executable file", nsIFilePicker.modeOpen );
-              var res = fp.show();
-              if( res == nsIFilePicker.returnOK ) {
-                  var file = fp.file;
-                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.path").value = file.path;
-                  // --- do something with the file here ---
-              }
-          };
-          var init = function() {
-              try {
-                  window.moveToAlertPosition();
-                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.name").value = window.arguments[0].inn.name;
-                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.path").value = window.arguments[0].inn.path;
-                  var argsElem = document.getElementById("info.vividcode.applauncher.prefwindow.edit.args").getElementsByTagName("textbox");
-                  for( var i = 0; i < window.arguments[0].inn.args.length; i++ ) {
-                      argsElem[i].value = window.arguments[0].inn.args[i];
-                  }
-                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.fileSelectButton").
-                                                addEventListener("command", function() { fileSelect(); }, false);
-              } catch(e) {
-                  window.alert(e);
-              }
-          };
-          window.addEventListener("dialogaccept", function() {
-              window.arguments[0].inn.setName( document.getElementById("info.vividcode.applauncher.prefwindow.edit.name").value );
-              window.arguments[0].inn.setPath( document.getElementById("info.vividcode.applauncher.prefwindow.edit.path").value );
-              var argsElem = document.getElementById("info.vividcode.applauncher.prefwindow.edit.args").getElementsByTagName("textbox");
-              var args = new Array();
-              for( var i = 0; i < argsElem.length; i++ ) {
-                  if( argsElem[i].value ) {
-                      args.push( argsElem[i].value );
-                  }
-              }
-              window.arguments[0].inn.setArgs( args );
-              window.arguments[0].out = true;
-          }, false);
-          window.addEventListener("dialogcancel", function() {
-              window.arguments[0].out = false;
-          }, false);
-          window.addEventListener("load", function() { init(); }, false);
-      })();
-  } catch(e) {
-      window.alert(e);
-  }
-  ]]>
-  </script>
-  <!-- 実際の表示を規定 -->
-  <vbox>
-    <!--<groupbox>
-      <caption label="adding your application" />-->
-      <vbox>
-        <grid>
-          <columns>
-            <column />
-            <column flex="1" />
-          </columns>
-          <rows>
-            <row>
-              <label control="info.vividcode.applauncher.prefwindow.edit.name" value="Name" />
-              <textbox id="info.vividcode.applauncher.prefwindow.edit.name" />
-            </row>
-            <row>
-              <label control="info.vividcode.applauncher.prefwindow.edit.path" value="Path" />
-              <hbox>
-                <textbox id="info.vividcode.applauncher.prefwindow.edit.path" flex="1" />
-                <button label="select" id="info.vividcode.applauncher.prefwindow.edit.fileSelectButton" />
-              </hbox>
-            </row>
-            <row>
-              <label control="info.vividcode.applauncher.prefwindow.edit.args1" value="Arguments" />
-              <vbox id="info.vividcode.applauncher.prefwindow.edit.args">
-                <textbox />
-                <textbox />
-                <textbox />
-                <textbox />
-                <textbox />
-              </vbox>
-            </row>
-          </rows>
-        </grid>
-        <!--
-        <hbox>
-          <spacer flex="1" />
-          <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />
-        </hbox>
-        -->
-      </vbox>
-      <!--
-      <vbox align="right">
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.name" value="Name" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.name" />
-        </hbox>
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.path" value="Path" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.path" />
-        </hbox>
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.args" value="Arguments" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.args" />
-        </hbox>
-        <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />
-      </vbox>
-      -->
-    <!--</groupbox>-->
-  </vbox>
-</dialog>
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?><!DOCTYPE prefwindow SYSTEM "chrome://applauncher/locale/options_dialog.dtd"><!--<?xml-stylesheet href="chrome://applauncher/content/prefs.css" type="text/css"?>--><!--  設定ダイアログ    cf. dialog について: https://developer.mozilla.org/ja/XUL_Tutorial/Creating_Dialogs    cf. dialog のサンプル: https://developer.mozilla.org/ja/Code_snippets/Dialogs  変更内容:     ver.0.6: 新たに作成.--><dialog id="info.vividcode.applauncher.pref.dialog" title="&dialog.title;"        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"        buttons="accept,cancel">  <!-- JavaScript を読み込み -->  <script src="chrome://applauncher/locale/applauncher.js"/>  <script src="applauncher.js"/>  <script type="application/x-javascript">  <![CDATA[  try {      // 初期化関数をロード時に実行する      (function() {          //var manager = new info.vividcode.ext.applauncher.PrefsManager();          /**           * ファイル選択用ダイアログ           */          var fileSelect = function() {              var nsIFilePicker = Components.interfaces.nsIFilePicker;              var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);              fp.init( window, "Select an executable file", nsIFilePicker.modeOpen );              var res = fp.show();              if( res == nsIFilePicker.returnOK ) {                  var file = fp.file;                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.path").value = file.path;                  // --- do something with the file here ---              }          };          var onClickArgInputBoxCreateButton = function(evt) {                  var al = info.vividcode.applauncher;                  var argsBox = document.getElementById("info.vividcode.applauncher.prefwindow.edit.args");                  argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) );          };          var init = function() {              try {                  var al = info.vividcode.applauncher;                  window.moveToAlertPosition();                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.name").value = window.arguments[0].inn.name;                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.path").value = window.arguments[0].inn.path;                  var argsBox = document.getElementById("info.vividcode.applauncher.prefwindow.edit.args");                  for( var i = 0; i < window.arguments[0].inn.args.length; i++ ) {                      argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) ).value = window.arguments[0].inn.args[i];                  }                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.fileSelectButton").                                                addEventListener("command", function() { fileSelect(); }, false);                  document.getElementById("info.vividcode.applauncher.prefwindow.edit.argInputBoxCreateButton").                                                addEventListener("command", onClickArgInputBoxCreateButton, false);              } catch(e) {                  window.alert(e);              }          };          window.addEventListener("dialogaccept", function() {              var al = info.vividcode.applauncher;              var prefIdPrefix = "info.vividcode.applauncher.prefwindow.";              window.arguments[0].inn.setName( document.getElementById(prefIdPrefix + "edit.name").value );              window.arguments[0].inn.setPath( document.getElementById(prefIdPrefix + "edit.path").value );              var argsElem = document.getElementById(prefIdPrefix + "edit.args").getElementsByTagNameNS( al.XUL_NS, "textbox" );              var args = new Array();              for( var i = 0; i < argsElem.length; i++ ) {                  if( argsElem[i].value ) {                      args.push( argsElem[i].value );                  }              }              window.arguments[0].inn.setArgs( args );              window.arguments[0].out = true;          }, false);          window.addEventListener("dialogcancel", function() {              window.arguments[0].out = false;          }, false);          window.addEventListener("load", function() { init(); }, false);      })();  } catch(e) {      window.alert(e);  }  ]]>  </script>  <!-- 実際の表示を規定 -->  <vbox>    <!--<groupbox>      <caption label="adding your application" />-->      <vbox>        <grid>          <columns>            <column />            <column flex="1" />          </columns>          <rows>            <row>              <label control="info.vividcode.applauncher.prefwindow.edit.name" value="Name" />              <textbox id="info.vividcode.applauncher.prefwindow.edit.name" />            </row>            <row>              <label control="info.vividcode.applauncher.prefwindow.edit.path" value="Path" />              <hbox>                <textbox id="info.vividcode.applauncher.prefwindow.edit.path" flex="1" />                <button label="select" id="info.vividcode.applauncher.prefwindow.edit.fileSelectButton" />              </hbox>            </row>            <row>              <vbox>                <label control="info.vividcode.applauncher.prefwindow.edit.args1" value="Arguments" />                <button label="add textbox" id="info.vividcode.applauncher.prefwindow.edit.argInputBoxCreateButton" />              </vbox>              <vbox id="info.vividcode.applauncher.prefwindow.edit.args">                <!-- JavaScript program adds <textbox /> elements here. -->              </vbox>            </row>          </rows>        </grid>        <!--        <hbox>          <spacer flex="1" />          <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />        </hbox>        -->      </vbox>      <!--      <vbox align="right">        <hbox align="center">          <label control="info.vividcode.applauncher.prefwindow.adding.name" value="Name" />          <textbox id="info.vividcode.applauncher.prefwindow.adding.name" />        </hbox>        <hbox align="center">          <label control="info.vividcode.applauncher.prefwindow.adding.path" value="Path" />          <textbox id="info.vividcode.applauncher.prefwindow.adding.path" />        </hbox>        <hbox align="center">          <label control="info.vividcode.applauncher.prefwindow.adding.args" value="Arguments" />          <textbox id="info.vividcode.applauncher.prefwindow.adding.args" />        </hbox>        <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />      </vbox>      -->    <!--</groupbox>-->  </vbox></dialog>

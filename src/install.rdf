@@ -11,9 +11,9 @@
     <em:name>AppLauncher</em:name>
     <!-- 拡張機能のバージョン. 規則あり -->
     <!-- https://developer.mozilla.org/ja/Toolkit_version_format 参考？ -->
-    <em:version>0.8.0.ex100922a</em:version>
+    <em:version>0.8.1</em:version>
     <!-- 拡張機能の説明 -->
-    <em:description>This extension lets you launch an external application via context menu.</em:description>
+    <em:description>This extension lets you launch an external application through the context menu.</em:description>
     <!-- 拡張機能の開発者 -->
     <em:creator>nobuoka</em:creator>
     <!-- 共同開発者？ -->
@@ -22,13 +22,6 @@
     <!--<em:homepageURL>http://www.vividcode.info/projects/applauncher/</em:homepageURL>-->
     <!-- 拡張機能の設定に関する XUL ファイル. 無くても良い -->
     <em:optionsURL>chrome://applauncher/content/options.xul</em:optionsURL>
-    <!-- 更新情報を確認するための RDF のパス -->
-    <em:updateURL>http://www.vividcode.info/projects/applauncher/update.rdf</em:updateURL>
-    <!-- 更新情報の RDF データのセキュリティを保証するための電子署名のための公開鍵. バージョンアップ時に変更する必要はない -->
-    <em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAGVzQgcjj+YncZI
-                  YjR1IQNEylmT3suHmbDp8WAF+HXn0jIjKukd1qOBLKX42z9Ozj2PX0
-                  3xMCCSdABI9z5DikA+3NWceUwHWENxQIMiCMN8XzqpBqhTS7MNX6M2
-                  OBHPSYfH1+OoaTsXAr5vrpy6GEuoEvWI+tbvUYZYaWNi4pEwIDAQAB</em:updateKey>
     
     <!-- 各地域の言語情報. 無くても良い -->
     <em:localized>

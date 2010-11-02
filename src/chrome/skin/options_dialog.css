@@ -1,0 +1,11 @@
+@charset "utf-8"; /* 文字コード指定 */
+
+dialog {
+	min-width:  450px;
+	min-height: 300px;
+	max-height: 750px;
+}
+
+label, textbox {
+	vertical-align: baseline;
+}

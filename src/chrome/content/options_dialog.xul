@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="chrome://applauncher/skin/options_dialog.css" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://applauncher/locale/options_dialog.dtd">
 <!--<?xml-stylesheet href="chrome://applauncher/content/prefs.css" type="text/css"?>-->
 <!--
@@ -50,6 +51,12 @@
                   for( var i = 0; i < window.arguments[0].inn.args.length; i++ ) {
                       argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) ).value = window.arguments[0].inn.args[i];
                   }
+                  // 最低でも 5 個のボックスは表示する. また, 空のボックスも 1 つおいておく
+                  var rc = 5 - window.arguments[0].inn.args.length;
+                  rc = ( rc > 1 ) ? rc : 1;
+                  for( i = 0; i < rc; i++ ) {
+                      argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) );
+                  }
                   document.getElementById("info.vividcode.applauncher.prefwindow.edit.fileSelectButton").
                                                 addEventListener("command", function() { fileSelect(); }, false);
                   document.getElementById("info.vividcode.applauncher.prefwindow.edit.argInputBoxCreateButton").
@@ -84,7 +91,7 @@
   ]]>
   </script>
   <!-- 実際の表示を規定 -->
-  <vbox>
+  <vbox flex="1" style="overflow: auto;">
     <!--<groupbox>
       <caption label="adding your application" />-->
       <vbox>
@@ -107,8 +114,8 @@
             </row>
             <row>
               <vbox>
-                <label control="info.vividcode.applauncher.prefwindow.edit.args1" value="Arguments" />
-                <button label="add textbox" id="info.vividcode.applauncher.prefwindow.edit.argInputBoxCreateButton" />
+                <label value="Arguments" />
+                <button label="add arg" id="info.vividcode.applauncher.prefwindow.edit.argInputBoxCreateButton" />
               </vbox>
               <vbox id="info.vividcode.applauncher.prefwindow.edit.args">
                 <!-- JavaScript program adds <textbox /> elements here. -->

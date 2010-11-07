@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="urn:mozilla:extension:applauncher@vividcode.info"
+                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAEZpB7OEbpBeXOx7gq7JaYoNzNkGbiYzX4N6dvrhhhUeNIkJC67VXN34HWpn0AGtUeh1JwqTtxL5KXU8A6BoVZ44pfqaQgpyP3ph/okAERORwyVLMG7ZxGWFwO9eBFqIdjk0U6RlwYvG9W6O/uL7nYIIuU84h2cRQDHwh43DvdJf">
+    <em:updates RDF:resource="rdf:#$gm0eg3"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="urn:mozilla:extension:applauncher@vividcode.info:0.8.2"
+                   em:version="0.8.2.ex"
+                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAGsCz/UKFmVlcRD09sTLLOvPlcLuklcqE3FNzdnNdFM6OE6lrJlp5urF3+e1W3igNauCOBo+W4M7V6r9JtYRl7wzJtLqJlusmX+foiYL1Mr2MqeUOqhY6ynfcah5/msR7swCQsFbZtBo67olR8i4m+QnCecS/MUaKy4gWfJwPTP3">
+    <em:targetApplication RDF:resource="rdf:#$km0eg3"/>
+  </RDF:Description>
+  <RDF:Seq RDF:about="rdf:#$gm0eg3">
+    <RDF:li RDF:resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.2"/>
+  </RDF:Seq>
+  <RDF:Description RDF:about="rdf:#$km0eg3"
+                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   em:minVersion="3.0"
+                   em:maxVersion="4.0b6"
+                   em:updateLink="http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.2.ex.xpi"
+                   em:updateHash="sha1:823A7354AE1A3696C816394BE36DAE0956D81ABF" />
+</RDF:RDF>

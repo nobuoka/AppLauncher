@@ -37,7 +37,7 @@ info.vividcode.applauncher.XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper
 /**
  * 現在表示中のページの URL を返す関数.
  */
-info.vividcode.applauncher.getCurrentPageURL = function() {
+info.vividcode.applauncher.getCurrentPageURL = function( popupNode ) {
 	// アクティブなウィンドウの取得
 	// cf. https://developer.mozilla.org/Ja/Code_snippets/Tabbed_browser
 	/*
@@ -49,12 +49,32 @@ info.vividcode.applauncher.getCurrentPageURL = function() {
 	// ブラウザウィンドウ領域からなら以下で OK.
 	return content.location.href;
 };
-info.vividcode.applauncher.getCurrentPageTURL = function() {
+info.vividcode.applauncher.getImageURL = function( popupNode ) {
+	var al = info.vividcode.applauncher;
+	// turi の設定
+	// turi は右クリックのリンク先 URI. 右クリックしたのがリンク要素じゃなければそのページの URI
+	var imageurl = null;
+	var targetNode = popupNode;
+	// 追加
+	while ( targetNode != null && targetNode.nodeName.toUpperCase() != "IMG" ) {
+		targetNode = targetNode.parentNode;
+	}
+	if( targetNode != null && targetNode.nodeName.toUpperCase() == "IMG" ) {
+		imageurl = targetNode.src;
+	} else {
+		// when the img element is not found
+		throw new Error( al.locale.errorMsg.IMG_ELEM_NOT_FOUND );
+	}
+	// imageurl には URI エンコードされた文字列が入っている
+	imageurl = decodeURIComponent(imageurl)
+	return imageurl;
+};
+info.vividcode.applauncher.getCurrentPageTURL = function( popupNode ) {
 	var al = info.vividcode.applauncher;
 	// turi の設定
 	// turi は右クリックのリンク先 URI. 右クリックしたのがリンク要素じゃなければそのページの URI
 	var turi = null;
-	var targetNode = document.popupNode;
+	var targetNode = popupNode;
 	while ( targetNode != null && targetNode.nodeName.toUpperCase() != "A" ) {
 		targetNode = targetNode.parentNode;
 	}
@@ -68,7 +88,7 @@ info.vividcode.applauncher.getCurrentPageTURL = function() {
 /**
  * 現在表示中のページのタイトルを返す関数.
  */
-info.vividcode.applauncher.getCurrentPageTitle = function() {
+info.vividcode.applauncher.getCurrentPageTitle = function( popupNode ) {
 	// アクティブなウィンドウの取得
 	// cf. https://developer.mozilla.org/Ja/Code_snippets/Tabbed_browser
 	/*
@@ -81,11 +101,12 @@ info.vividcode.applauncher.getCurrentPageTitle = function() {
 	return content.document.title;
 };
 
-info.vividcode.applauncher.decodeEntityReference = function( str ) {
+info.vividcode.applauncher.decodeEntityReference = function( str, popupNode ) {
 	var al = info.vividcode.applauncher;
-	var uri   = al.getCurrentPageURL();
-	var turi  = al.getCurrentPageTURL();
-	var title = al.getCurrentPageTitle();
+	var uri   = al.getCurrentPageURL( popupNode );
+	var turi  = al.getCurrentPageTURL( popupNode );
+	var title = al.getCurrentPageTitle( popupNode );
+	var imageurl = null;
 	return str.replace( /&[^&;]+;/g, function(substr) {
 		if ( substr == "&amp;" ) { return "&"; }
 		else if ( substr == "&lt;" ) { return "<"; }
@@ -96,7 +117,13 @@ info.vividcode.applauncher.decodeEntityReference = function( str ) {
 		else if ( substr == "&eurl;" ) { return encodeURIComponent(uri); }
 		else if ( substr == "&turl;" ) { return turi; }
 		else if ( substr == "&eturl;" ) { return encodeURIComponent(turi); }
-		else if ( substr == "&title;" ) { return title; }
+		else if ( substr == "&imageurl;" ) {
+			if(! imageurl) { imageurl = al.getImageURL(popupNode) };
+			return imageurl;
+		} else if ( substr == "&eimageurl;" ) {
+			if(! imageurl) { imageurl = al.getImageURL(popupNode) };
+			return encodeURIComponent(imageurl);
+		} else if ( substr == "&title;" ) { return title; }
 		else if ( substr == "&etitle;" ) { return encodeURIComponent(title); }
 	} );
 };
@@ -104,8 +131,11 @@ info.vividcode.applauncher.decodeEntityReference = function( str ) {
 /**
  * 外部アプリケーションを起動する関数
  */
-info.vividcode.applauncher.launchOuterApplication = function( appInfo ) {
+info.vividcode.applauncher.launchOuterApplication = function( targetElem ) {
 	var al = info.vividcode.applauncher;
+	var appInfo = targetElem.appInfo;
+	// popupNode の取得: 前者は Fx3.6 以前用, 後者は Fx4.0 以降用
+	var popupNode = document.popupNode || targetElem.parentNode.parentNode.parentNode.triggerNode;
 	try {
 		var path = appInfo.path;
 		var argsSource = appInfo.args;
@@ -115,7 +145,8 @@ info.vividcode.applauncher.launchOuterApplication = function( appInfo ) {
 		var args = new Array();
 		for( var i = 0; i < argsSource.length; i++ ) {
 			// 文字コード変換とエンティティリファレンスのデコード
-			var uc = Components.classes['@mozilla.org/intl/scriptableunicodeconverter'].getService( Components.interfaces.nsIScriptableUnicodeConverter );
+			var uc = Components.classes['@mozilla.org/intl/scriptableunicodeconverter']
+						.getService( Components.interfaces.nsIScriptableUnicodeConverter );
 			// <<shift_jis|てあててあた>>
 			var str = argsSource[i];
 			var match = null;
@@ -126,18 +157,18 @@ info.vividcode.applauncher.launchOuterApplication = function( appInfo ) {
 				// match[2] は charset
 				// match[3] は body
 				// match[4] はマッチしたところより後ろの部分.
-				array.unshift( al.decodeEntityReference( match[4] || '' ) );
+				array.unshift( al.decodeEntityReference( match[4] || '', popupNode ) );
 				// 文字コード変換
 				try {
 					uc.charset = match[2];
 				} catch( err ) {
 					throw new Error( al.locale.errorMsg.ENCODING_NOT_SUPPORTED + match[2] );
 				}
-				var tmp = al.decodeEntityReference( match[3] );
+				var tmp = al.decodeEntityReference( match[3], popupNode );
 				array.unshift( uc.ConvertFromUnicode(tmp) + uc.Finish() );
 				str = match[1] || '';
 			}
-			array.unshift( al.decodeEntityReference( str ) );
+			array.unshift( al.decodeEntityReference( str, popupNode ) );
 			args.push( array.join('') );
 		}
 		
@@ -174,7 +205,7 @@ info.vividcode.applauncher.createContextMenuItem = function( win, appInfo ) {
 	item.myWindow = win;
 	item.addEventListener( "command", function(evt) {
 		try {
-			evt.currentTarget.myWindow.info.vividcode.applauncher.launchOuterApplication( evt.currentTarget.appInfo );
+			evt.currentTarget.myWindow.info.vividcode.applauncher.launchOuterApplication( evt.currentTarget );
 		} catch(e) {
 			evt.currentTarget.myWindow.alert(e);
 		}

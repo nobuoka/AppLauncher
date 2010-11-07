@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <!-- この Description リソースは、foobar@developer.mozilla.org という ID のあるアドオンに
+       関する、すべての更新情報と互換性の情報を含んでいます。複数のアドオンの情報を
+       同じ RDF ファイルの中に列挙することもできます。 -->
+  <RDF:Description about="urn:mozilla:extension:applauncher@vividcode.info">
+    <em:updates>
+      <RDF:Seq>
+        <!-- resource 属性は、about 属性が対応している以下のそれぞれの RDF:Description
+             エントリを指し示しています。実際の URI は好きなように書いて構いませんが、
+             RDF の文法に従ってそれぞれ固有の URI を持たなくてはなりませんので、
+             バージョン番号をそれぞれのバージョンの末尾に追加しました -->
+        <RDF:li resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.2"/>
+        <!--<RDF:li resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.3"/>-->
+      </RDF:Seq>
+    </em:updates>
+    <em:signature>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAGVzQgcjj+YncZI
+                  YjR1IQNEylmT3suHmbDp8WAF+HXn0jIjKukd1qOBLKX42z9Ozj2PX0
+                  3xMCCSdABI9z5DikA+3NWceUwHWENxQIMiCMN8XzqpBqhTS7MNX6M2
+                  OBHPSYfH1+OoaTsXAr5vrpy6GEuoEvWI+tbvUYZYaWNi4pEwIDAQAB</em:signature>
+  </RDF:Description>
+  <!-- これは前の例で li の中に置かれている Description と同じ情報を示しています -->
+  <RDF:Description about="urn:mozilla:extension:applauncher@vividcode.info:0.8.2">
+    <em:version>0.8.2.ex</em:version>
+    <em:targetApplication>
+      <RDF:Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>3.0</em:minVersion>
+        <em:maxVersion>4.0b6</em:maxVersion>
+        <em:updateLink>http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.2.ex.xpi</em:updateLink>
+        <em:updateHash>sha1:823A7354AE1A3696C816394BE36DAE0956D81ABF</em:updateHash>
+      </RDF:Description>
+    </em:targetApplication>
+  </RDF:Description>
+  <!--
+  <RDF:Description about="urn:mozilla:extension:applauncher@vividcode.info:0.8.3">
+    <em:version>0.8.3.ex</em:version>
+  </RDF:Description>
+  -->
+</RDF:RDF>

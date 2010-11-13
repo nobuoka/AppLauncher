@@ -123,6 +123,13 @@ info.vividcode.applauncher.decodeEntityReference = function( str, popupNode ) {
 		} else if ( substr == "&eimageurl;" ) {
 			if(! imageurl) { imageurl = al.getImageURL(popupNode) };
 			return encodeURIComponent(imageurl);
+		} else if ( substr == "&ImgFilePathWin;" ) {
+			if(! imageurl) { imageurl = al.getImageURL(popupNode) };
+			if( imageurl.match(/^file:\/\/\//) ) {
+				return imageurl.replace( /^file:\/\/\//, "" ).replace( /\//g, "\\" );
+			} else {
+				throw new Error( al.locale.errorMsg.IMG_FILE_ISNT_LOCAL_FILE );
+			}
 		} else if ( substr == "&title;" ) { return title; }
 		else if ( substr == "&etitle;" ) { return encodeURIComponent(title); }
 	} );
@@ -134,7 +141,8 @@ info.vividcode.applauncher.decodeEntityReference = function( str, popupNode ) {
 info.vividcode.applauncher.launchOuterApplication = function( targetElem ) {
 	var al = info.vividcode.applauncher;
 	var appInfo = targetElem.appInfo;
-	// popupNode の取得: 前者は Fx3.6 以前用, 後者は Fx4.0 以降用
+	// popupNode の取得: 前者は Fx3.6 以前用, 後者は Fx4.0 以降用 (Fx4.0 以降でも前者で OK の模様)
+	//window.alert( "popupNode: " + document.popupNode + ", triggerNode: " + targetElem.parentNode.parentNode.parentNode.triggerNode );
 	var popupNode = document.popupNode || targetElem.parentNode.parentNode.parentNode.triggerNode;
 	try {
 		var path = appInfo.path;
@@ -183,54 +191,47 @@ info.vividcode.applauncher.launchOuterApplication = function( targetElem ) {
 		var process = Components.classes["@mozilla.org/process/util;1"].createInstance( Components.interfaces.nsIProcess );
 		process.init( file );
 		process.run( false, args, args.length ); // プロセスの起動 (最初のパラメータが true なら、スレッドはプロセスが終わるまでブロックされる)
-		
 	} catch(e) {
 		window.alert( "[AppLauncher error message]\n" + e.message );
 	}
 };
 
-/*
-info.vividcode.applauncher.onLaunch = function(evt) {
-	var al = info.vividcode.applauncher;
-	al.launchOuterApplication( evt.currentTarget.appInfo );
+info.vividcode.applauncher.onCmdToLaunchApp = function( evt ) {
+	try {
+		info.vividcode.applauncher.launchOuterApplication( evt.currentTarget );
+	} catch(e) {
+		window.alert(e);
+	}
 };
-*/
-info.vividcode.applauncher.createContextMenuItem = function( win, appInfo ) {
+info.vividcode.applauncher.createContextMenuItem = function( appInfo ) {
 	var al = info.vividcode.applauncher;
 	// "menuitem" 要素の作成
-	var item = win.document.createElementNS( al.XUL_NS, "menuitem" );
+	var item = document.createElementNS( al.XUL_NS, "menuitem" );
 	item.setAttribute( "label", appInfo.name );
 	// イベントリスナの追加
 	item.appInfo  = appInfo;
-	item.myWindow = win;
-	item.addEventListener( "command", function(evt) {
-		try {
-			evt.currentTarget.myWindow.info.vividcode.applauncher.launchOuterApplication( evt.currentTarget );
-		} catch(e) {
-			evt.currentTarget.myWindow.alert(e);
-		}
-	}, false );
+	item.addEventListener( "command", al.onCmdToLaunchApp, false );
 	return item;
 };
-
+info.vividcode.applauncher.destroyContextMenuItem = function( item ) {
+	var al = info.vividcode.applauncher;
+	item.appInfo  = null;
+	item.removeEventListener( "command", al.onCmdToLaunchApp, false );
+};
+info.vividcode.applauncher.onCmdToOpenPrefWindow = function( evt ) {
+	// 設定ウィンドウを表示
+	window.open( "chrome://applauncher/content/options.xul", "applauncherprefs", "chrome,dialog,resizable=yes" ); 
+}
 /**
  * コンテキストメニューの初期化を行う関数
  */
 info.vividcode.applauncher.initializeContextMenu = function() {
-try {
-	var al = info.vividcode.applauncher;
-	// 設定の読み込み
-	var appInfoList = al.prefs.loadAppInfoList();
-	//var prefs = null;
-	// 全ての ChromeWindow に対して処理を行う
-	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
-	var type = null;
-	var enumerator = wm.getEnumerator(type);
-	while( enumerator.hasMoreElements() ) {
-		var win = enumerator.getNext();
-		// |win| は [Object ChromeWindow] である(|window| と同等)。これに何かをする
+	try {
+		var al = info.vividcode.applauncher;
+		// 設定の読み込み
+		var appInfoList = al.prefs.loadAppInfoList();
 		// コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
-		var menupopup = win.document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
+		var menupopup = document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
 		if( menupopup ) {
 			// もともとある要素を削除
 			while( menupopup.hasChildNodes() ) {
@@ -239,36 +240,67 @@ try {
 			// 要素を追加
 			if( appInfoList != null && appInfoList.length != 0 ) {
 				for( var i = 0; i < appInfoList.length; i++ ) {
-					menupopup.appendChild( al.createContextMenuItem(win, appInfoList[i]) );
+					menupopup.appendChild( al.createContextMenuItem(appInfoList[i]) );
 				}
 			} else {
 				// 設定項目が存在しないときのメッセージを追加
-				var item = win.document.createElementNS( al.XUL_NS, "menuitem" );
+				var item = document.createElementNS( al.XUL_NS, "menuitem" );
 				item.setAttribute( "label", al.locale.contextMenu.NON_PREF_MSG );
 				menupopup.appendChild(item);
 			}
 			// "menuseparator" 要素を追加
-			menupopup.appendChild( win.document.createElementNS( al.XUL_NS, "menuseparator" ) );
+			menupopup.appendChild( document.createElementNS( al.XUL_NS, "menuseparator" ) );
 			// 設定画面を起動する要素を追加
 			// "menuitem" 要素の作成
-			var item = win.document.createElementNS( al.XUL_NS, "menuitem" );
-			// "label" 属性に "adding item!" という値を設定
+			var item = document.createElementNS( al.XUL_NS, "menuitem" );
 			item.setAttribute( "label", al.locale.contextMenu.PREFERENCES );
-			// イベントリスナの追加
-			item.myWindow = win;
-			item.addEventListener( "command", function(evt) {
-				// 設定ウィンドウを表示
-				evt.currentTarget.myWindow.open( "chrome://applauncher/content/options.xul", "applauncherprefs", "chrome,dialog,resizable=yes" ); 
-			}, false );
+			item.addEventListener( "command", al.onCmdToOpenPrefWindow, false );
 			// "menupopup" 要素の子ノードに追加
 			menupopup.appendChild(item);
 		}
+	} catch(e) {
+		window.alert(e);
 	}
-} catch(e) {
-	window.alert(e);
-}
 };
 
+/**
+ * 全ての ChromeWindow のコンテキストメニュー内にある AppLauncher に関する項目を初期化する
+ */
+info.vividcode.applauncher.initializeContextMenuInAllWindow = function() {
+	try {
+		// 全ての ChromeWindow に対して処理を行う
+		var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+		var type = null;
+		var enumerator = wm.getEnumerator(type);
+		while( enumerator.hasMoreElements() ) {
+			var win = enumerator.getNext();
+			// |win| は [Object ChromeWindow] である(|window| と同等)。これに何かをする
+			// コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
+			var menupopup = win.document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
+			if( menupopup ) {
+				win.info.vividcode.applauncher.initializeContextMenu();
+			}
+		}
+	} catch(e) {
+		window.alert(e);
+	}
+}
+
+info.vividcode.applauncher.cleanupContextMenu = function() {
+	try {
+		var al = info.vividcode.applauncher;
+		// コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
+		var menupopup = document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
+		if( menupopup ) {
+			var items = menupopup.getElementsByTagNameNS( al.XUL_NS, "menuitem" );
+			for( var i = 0; i < items.length - 1; i++ ) {
+				al.destroyContextMenuItem( items.item(i) );
+			}
+		}
+	} catch(e) {
+		window.alert(e);
+	}
+};
 
 // 設定関係
 info.vividcode.applauncher.prefs = {};
@@ -386,43 +418,3 @@ info.vividcode.applauncher.prefs.setCharPref = function( prefName, prefValue ) {
 	var prefBranch = prefSvc.getBranch( al.prefs.BRANCH_STRING );
 	prefBranch.setCharPref( prefName, unescape(encodeURIComponent(prefValue)) );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-var applauncher = {
-	onLoad: function() {
-		// initialization code
-		this.initialized = true;
-		this.strings = document.getElementById("applauncher-strings");
-	},
-	
-	onMenuItemCommand: function(e) {
-		var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-		                              .getService(Components.interfaces.nsIPromptService);
-		promptService.alert(window, this.strings.getString("helloMessageTitle"),
-		                              this.strings.getString("helloMessage"));
-	},
-	
-	onToolbarButtonCommand: function(e) {
-		// just reuse the function above.  you can change this, obviously!
-		applauncher.onMenuItemCommand(e);
-	}
-};
-*/
-//window.addEventListener("load", applauncher.onLoad, false);
-//window.alert("load applauncher.js");

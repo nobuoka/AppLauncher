@@ -2,7 +2,6 @@
 <?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
 <?xml-stylesheet href="chrome://applauncher/skin/options_dialog.css" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://applauncher/locale/options_dialog.dtd">
-<!--<?xml-stylesheet href="chrome://applauncher/content/prefs.css" type="text/css"?>-->
 <!--
   設定ダイアログ
     cf. dialog について: https://developer.mozilla.org/ja/XUL_Tutorial/Creating_Dialogs
@@ -92,8 +91,6 @@
   </script>
   <!-- 実際の表示を規定 -->
   <vbox flex="1" style="overflow: auto;">
-    <!--<groupbox>
-      <caption label="adding your application" />-->
       <vbox>
         <grid>
           <columns>
@@ -123,30 +120,6 @@
             </row>
           </rows>
         </grid>
-        <!--
-        <hbox>
-          <spacer flex="1" />
-          <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />
-        </hbox>
-        -->
       </vbox>
-      <!--
-      <vbox align="right">
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.name" value="Name" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.name" />
-        </hbox>
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.path" value="Path" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.path" />
-        </hbox>
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.args" value="Arguments" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.args" />
-        </hbox>
-        <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />
-      </vbox>
-      -->
-    <!--</groupbox>-->
   </vbox>
 </dialog>

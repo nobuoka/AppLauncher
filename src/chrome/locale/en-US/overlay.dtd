@@ -1,8 +1,1 @@
-<!ENTITY applauncher.label "Your localized menuitem">
-<!ENTITY applauncherContext.label "Your Menuitem">
-<!ENTITY applauncherContext.accesskey "Y">
-<!ENTITY applauncherToolbarButton.label "Your Toolbar Button">
-<!ENTITY applauncherToolbarButton.tooltip "This is your toolbar button!">
-<!ENTITY applauncherSidebar.label "Your Sidebar">
-<!ENTITY applauncherToolbar.name  "example">
-<!ENTITY applauncherToolbar.label "This is an example toolbar. You can hide it under View &gt; toolbars &gt; &applauncherToolbar.name;">
+<!-- coding: UTF-8, エンコーディング: UTF-8 -->

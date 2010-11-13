@@ -6,31 +6,15 @@
   <script src="chrome://applauncher/locale/applauncher.js"/>
   <script src="applauncher.js"/>
   <script src="ff-overlay.js"/>
-  <!--<script type="application/x-javascript" src="chrome://applauncher/content/AppLauncher.js" />
-  <script type="application/x-javascript" src="chrome://applauncher/content/AppPref.js" />
-  <script type="application/x-javascript" src="chrome://applauncher/content/launcher.js" />-->
-
-  <!-- JavaScript の多言語化 -->
-  <!--
-  <stringbundleset id="stringbundleset">
-    <stringbundle id="applauncher-strings" src="chrome://applauncher/locale/overlay.properties"/>
-  </stringbundleset>
-  -->
 
   <!-- コンテキストメニューへの追加: cf. https://developer.mozilla.org/ja/XUL/PopupGuide/Extensions -->
-  <popup id="contentAreaContextMenu">
-    <!--
-    <menuitem id="context-applauncher" label="&applauncherContext.label;"
-              accesskey="&applauncherContext.accesskey;"
-              insertafter="context-stop"
-              oncommand="applauncher.onMenuItemCommand(event)"/>
-    -->
+  <menupopup id="contentAreaContextMenu">
     <menuseparator id="info.vividcode.applauncher.contextmenu.separator" />
     <menu id="info.vividcode.applauncher.contextmenu" label="AppLauncher">
       <menupopup id="info.vividcode.applauncher.contextmenu.items">
         <!-- JavaScript ("launcher.js") によってこの部分に要素を追加する -->
       </menupopup>
     </menu>
-  </popup>
+  </menupopup>
   
 </overlay>

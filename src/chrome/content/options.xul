@@ -52,56 +52,5 @@
       
     </hbox>
     
-    <!--
-    <groupbox>
-      <caption label="adding your application" />
-      <vbox>
-        <grid>
-          <columns>
-            <column />
-            <column flex="1" />
-          </columns>
-          <rows>
-            <row>
-              <label control="info.vividcode.applauncher.prefwindow.adding.name" value="Name" />
-              <textbox id="info.vividcode.applauncher.prefwindow.adding.name" />
-            </row>
-            <row>
-              <label control="info.vividcode.applauncher.prefwindow.adding.path" value="Path" />
-              <hbox>
-                <textbox id="info.vividcode.applauncher.prefwindow.adding.path" flex="1" />
-                <button label="select" id="info.vividcode.applauncher.prefwindow.adding.selectButton" />
-              </hbox>
-            </row>
-            <row>
-              <label control="info.vividcode.applauncher.prefwindow.adding.args" value="Arguments" />
-              <textbox id="info.vividcode.applauncher.prefwindow.adding.args" />
-            </row>
-          </rows>
-        </grid>
-        <hbox>
-          <spacer flex="1" />
-          <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />
-        </hbox>
-      </vbox>
-      -->
-      <!--
-      <vbox align="right">
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.name" value="Name" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.name" />
-        </hbox>
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.path" value="Path" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.path" />
-        </hbox>
-        <hbox align="center">
-          <label control="info.vividcode.applauncher.prefwindow.adding.args" value="Arguments" />
-          <textbox id="info.vividcode.applauncher.prefwindow.adding.args" />
-        </hbox>
-        <button label="add" id="info.vividcode.applauncher.prefwindow.adding.button" />
-      </vbox>
-    </groupbox>
-      -->
   </vbox>
 </dialog>

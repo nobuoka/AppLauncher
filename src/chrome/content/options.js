@@ -118,8 +118,26 @@ info.vividcode.applauncher.prefs.initializePrefsWindow = function() {
 		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.mvu").addEventListener("command", al.prefs.onCmdMvu, false);
 		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.mvd").addEventListener("command", al.prefs.onCmdMvd, false);
 		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.add").addEventListener("command", al.prefs.onCmdAdd, false);
-		window.addEventListener( "dialogaccept", info.vividcode.applauncher.prefs.onCmdSaveAndExit, false );
-		window.addEventListener( "dialogcancel", info.vividcode.applauncher.prefs.onCmdNonSaveAndExit, false );
+		window.addEventListener( "dialogaccept", al.prefs.onCmdSaveAndExit,    false );
+		window.addEventListener( "dialogcancel", al.prefs.onCmdNonSaveAndExit, false );
+	} catch(e) {
+		window.alert(e);
+	}
+};
+/**
+ * 終了処理を行う
+ */
+info.vividcode.applauncher.prefs.cleanupPrefsWindow = function() {
+	try {
+		var al = info.vividcode.applauncher;
+		// Event Listener の追加
+		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.edt").removeEventListener("command", al.prefs.onCmdEdt, false);
+		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.del").removeEventListener("command", al.prefs.onCmdDel, false);
+		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.mvu").removeEventListener("command", al.prefs.onCmdMvu, false);
+		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.mvd").removeEventListener("command", al.prefs.onCmdMvd, false);
+		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.add").removeEventListener("command", al.prefs.onCmdAdd, false);
+		window.removeEventListener( "dialogaccept", al.prefs.onCmdSaveAndExit, false );
+		window.removeEventListener( "dialogcancel", al.prefs.onCmdNonSaveAndExit, false );
 	} catch(e) {
 		window.alert(e);
 	}
@@ -139,7 +157,7 @@ info.vividcode.applauncher.prefs.saveFromPrefsWindow = function() {
 		}
 		al.prefs.saveAppInfoList( appInfoList );
 		// コンテキストメニューを初期化する
-		al.initializeContextMenu();
+		al.initializeContextMenuInAllWindow();
 	} catch(e) {
 		window.alert(e);
 	}
@@ -163,4 +181,13 @@ info.vividcode.applauncher.prefs.loadToPrefsWindow = function() {
 	}
 };
 
-window.addEventListener( "load", function(evt) { info.vividcode.applauncher.prefs.initializePrefsWindow(); }, false );
+info.vividcode.applauncher.prefs.onLoad   = function(evt) {
+	info.vividcode.applauncher.prefs.initializePrefsWindow();
+};
+info.vividcode.applauncher.prefs.onUnload = function(evt) {
+	info.vividcode.applauncher.prefs.cleanupPrefsWindow();
+	window.removeEventListener( "load",   info.vividcode.applauncher.prefs.onLoad,   false );
+	window.removeEventListener( "unload", info.vividcode.applauncher.prefs.onUnload, false );
+};
+window.addEventListener( "load",   info.vividcode.applauncher.prefs.onLoad,   false );
+window.addEventListener( "unload", info.vividcode.applauncher.prefs.onUnload, false );

@@ -41,7 +41,7 @@
         <em:minVersion>3.0</em:minVersion>
         <em:maxVersion>4.0b7</em:maxVersion>
         <em:updateLink>http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.3.ex-fx.xpi</em:updateLink>
-        <em:updateHash>sha1:E263A17FE0948BDC7FD670BAD21ADE0D8C86510B</em:updateHash>
+        <em:updateHash>sha1:8475F658CC3A62C1BC22EC1864640332A625875A</em:updateHash>
       </RDF:Description>
     </em:targetApplication>
   </RDF:Description>

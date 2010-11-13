@@ -2,34 +2,34 @@
 <RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
          xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <RDF:Description RDF:about="rdf:#$Leq+y"
+  <RDF:Description RDF:about="urn:mozilla:extension:applauncher@vividcode.info:0.8.3"
+                   em:version="0.8.3.ex"
+                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAKc0cSIF5EfrqgfxVgJU1gpObXbXQHkq5CzDlz9R6WzgzNeocjunnmLWclMnFuCVYPz4gCXwK6kzlhEwNEVMtJ25Gvhn+Te//ysrUgyY49psY4YI6K7PxgexgPpJDsXb98EfXZb6zC6J9NSafkPmBpSR5T8T9YhCCa+ssraBTreB">
+    <em:targetApplication RDF:resource="rdf:#$ubM1S"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="urn:mozilla:extension:applauncher@vividcode.info:0.8.2"
+                   em:version="0.8.2.ex"
+                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAGsCz/UKFmVlcRD09sTLLOvPlcLuklcqE3FNzdnNdFM6OE6lrJlp5urF3+e1W3igNauCOBo+W4M7V6r9JtYRl7wzJtLqJlusmX+foiYL1Mr2MqeUOqhY6ynfcah5/msR7swCQsFbZtBo67olR8i4m+QnCecS/MUaKy4gWfJwPTP3">
+    <em:targetApplication RDF:resource="rdf:#$mbM1S"/>
+  </RDF:Description>
+  <RDF:Seq RDF:about="rdf:#$ibM1S">
+    <RDF:li RDF:resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.2"/>
+    <RDF:li RDF:resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.3"/>
+  </RDF:Seq>
+  <RDF:Description RDF:about="urn:mozilla:extension:applauncher@vividcode.info"
+                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAK/5TpbBo8rCJUCCCxROfTCDNR5atO3/gj9IkR3VRrCg20umtuQqxoACLKZdYuXrSiWQviRoljlgWXuFvjCQuFgC44H7x9UmF+NexbvHFSIt9y+CwqbivqdNNs8C/MVAMIPLQNuMFiY6ddlDD1Vo1dAdjcMO7P0Rzo6bKqQbzBa3">
+    <em:updates RDF:resource="rdf:#$ibM1S"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="rdf:#$mbM1S"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="3.0"
                    em:maxVersion="4.0b6"
                    em:updateLink="http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.2.ex.xpi"
                    em:updateHash="sha1:823A7354AE1A3696C816394BE36DAE0956D81ABF" />
-  <RDF:Description RDF:about="rdf:#$Teq+y"
+  <RDF:Description RDF:about="rdf:#$ubM1S"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="3.0"
                    em:maxVersion="4.0b7"
                    em:updateLink="http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.3.ex-fx.xpi"
-                   em:updateHash="sha1:E263A17FE0948BDC7FD670BAD21ADE0D8C86510B" />
-  <RDF:Description RDF:about="urn:mozilla:extension:applauncher@vividcode.info:0.8.3"
-                   em:version="0.8.3.ex"
-                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAJ0DW5V0AXtHdw+RNSP1KgBq5kTg1mIocOPHdvlmofvIcFFhwZDcjFf8EvO1V5kbSi6/zKtbcrG55A3qUO9hYl7YOcrPMxUPEsdpM5EGLIZYs36lhN4o/Hb7HIbEXavilL/HxGbHHn+WnJEAvSAtwHotF9y8+aQfs5bvRROLZ2PM">
-    <em:targetApplication RDF:resource="rdf:#$Teq+y"/>
-  </RDF:Description>
-  <RDF:Description RDF:about="urn:mozilla:extension:applauncher@vividcode.info:0.8.2"
-                   em:version="0.8.2.ex"
-                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAGsCz/UKFmVlcRD09sTLLOvPlcLuklcqE3FNzdnNdFM6OE6lrJlp5urF3+e1W3igNauCOBo+W4M7V6r9JtYRl7wzJtLqJlusmX+foiYL1Mr2MqeUOqhY6ynfcah5/msR7swCQsFbZtBo67olR8i4m+QnCecS/MUaKy4gWfJwPTP3">
-    <em:targetApplication RDF:resource="rdf:#$Leq+y"/>
-  </RDF:Description>
-  <RDF:Description RDF:about="urn:mozilla:extension:applauncher@vividcode.info"
-                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBACpgwLuI2isJyN7RA8edKaxMjE53KTYVwbGyoFCi2sf9RxvxKubH7oBPEpYWd4aZhMG6WeqYNphMAMyHJ2bhxvFLjGDRkS5mNcSmD0/ZAlImewm6HZkydETSA1WToUtkdvED5/5YRzVNbP4kWJN8nqbM/dUYxmeExISmW7ubCWzv">
-    <em:updates RDF:resource="rdf:#$Heq+y"/>
-  </RDF:Description>
-  <RDF:Seq RDF:about="rdf:#$Heq+y">
-    <RDF:li RDF:resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.2"/>
-    <RDF:li RDF:resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.3"/>
-  </RDF:Seq>
+                   em:updateHash="sha1:8475F658CC3A62C1BC22EC1864640332A625875A" />
 </RDF:RDF>

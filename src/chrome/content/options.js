@@ -1,10 +1,14 @@
-//info.vividcode.applauncher.prefs = {};
+// coding: utf-8
+
+// global variable [applauncher] is a namespace object of this package
+
+(function() { // begin the scope of the variables in this file
 
 /**
  * 選択されている項目を取得する
  */
-info.vividcode.applauncher.prefs.getSelectedAppInfo = function() {
-	var al = info.vividcode.applauncher;
+applauncher.prefs.getSelectedAppInfo = function() {
+	var al = applauncher;
 	var listbox = document.getElementById( al.prefs.PREFS_BOX_ID );
 	var items = listbox.selectedItems;
 	// 選択項目が無い
@@ -20,9 +24,9 @@ info.vividcode.applauncher.prefs.getSelectedAppInfo = function() {
 	return items[0].appInfo;
 };
 
-info.vividcode.applauncher.prefs.onCmdAdd = function( evt ) {
+applauncher.prefs.onCmdAdd = function( evt ) {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		// inn は項目. out は正常に終了したか否か
 		var appInfo = new al.AppInfo( "", "", new Array() );
 		var params = { inn: appInfo, out: null };
@@ -35,9 +39,9 @@ info.vividcode.applauncher.prefs.onCmdAdd = function( evt ) {
 		window.alert(e);
 	}
 };
-info.vividcode.applauncher.prefs.onCmdDel = function( evt ) {
+applauncher.prefs.onCmdDel = function( evt ) {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		var item = al.prefs.getSelectedAppInfo().elemForPrefsWindow;
 		// 削除していいですか？ というメッセージ
 		var params = { title: al.locale.prefs.confMsg.DEL_CONF_TITLE, message: al.locale.prefs.confMsg.DEL_CONF_MSG, returnValue: null };
@@ -49,9 +53,9 @@ info.vividcode.applauncher.prefs.onCmdDel = function( evt ) {
 		window.alert(e);
 	}
 };
-info.vividcode.applauncher.prefs.onCmdMvu = function( evt ) {
+applauncher.prefs.onCmdMvu = function( evt ) {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		var item = al.prefs.getSelectedAppInfo().elemForPrefsWindow;
 		if( item.previousSibling != null && item.previousSibling.nodeName == "listitem" ) {
 			item.parentNode.insertBefore(item, item.previousSibling);
@@ -61,9 +65,9 @@ info.vividcode.applauncher.prefs.onCmdMvu = function( evt ) {
 		window.alert(e);
 	}
 };
-info.vividcode.applauncher.prefs.onCmdMvd = function( evt ) {
+applauncher.prefs.onCmdMvd = function( evt ) {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		var item = al.prefs.getSelectedAppInfo().elemForPrefsWindow;
 		if( item.nextSibling != null && item.nextSibling.nodeName == "listitem" ) {
 			item.parentNode.insertBefore(item.nextSibling, item);
@@ -72,9 +76,9 @@ info.vividcode.applauncher.prefs.onCmdMvd = function( evt ) {
 		window.alert(e);
 	}
 };
-info.vividcode.applauncher.prefs.onCmdEdt = function( evt ) {
+applauncher.prefs.onCmdEdt = function( evt ) {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		var item = al.prefs.getSelectedAppInfo();
 		var params = { inn: item, out: null };
 		window.openDialog( "chrome://applauncher/content/options_dialog.xul", "", "chrome,dialog,modal,resizable=yes", params ).focus();
@@ -84,17 +88,17 @@ info.vividcode.applauncher.prefs.onCmdEdt = function( evt ) {
 };
 
 
-info.vividcode.applauncher.prefs.onCmdSaveAndExit = function(evt) {
+applauncher.prefs.onCmdSaveAndExit = function(evt) {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		al.prefs.saveFromPrefsWindow();
 	} catch(e) {
 		window.alert(e);
 	}
 };
-info.vividcode.applauncher.prefs.onCmdNonSaveAndExit = function(evt) {
+applauncher.prefs.onCmdNonSaveAndExit = function(evt) {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		var params = {title: al.locale.prefs.confMsg.NOTSAVE_CONF_TITLE, message: al.locale.prefs.confMsg.NOTSAVE_CONF_MSG, returnValue: null};
 		window.openDialog("chrome://applauncher/content/custom_dialog.xul", "", "chrome,dialog,modal,resizable=yes", params).focus();
 		if( ! params.returnValue ) {
@@ -108,9 +112,9 @@ info.vividcode.applauncher.prefs.onCmdNonSaveAndExit = function(evt) {
 /**
  * 初期化を行う
  */
-info.vividcode.applauncher.prefs.initializePrefsWindow = function() {
+applauncher.prefs.initializePrefsWindow = function() {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		al.prefs.loadToPrefsWindow();
 		// Event Listener の追加
 		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.edt").addEventListener("command", al.prefs.onCmdEdt, false);
@@ -127,9 +131,9 @@ info.vividcode.applauncher.prefs.initializePrefsWindow = function() {
 /**
  * 終了処理を行う
  */
-info.vividcode.applauncher.prefs.cleanupPrefsWindow = function() {
+applauncher.prefs.cleanupPrefsWindow = function() {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		// Event Listener の追加
 		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.edt").removeEventListener("command", al.prefs.onCmdEdt, false);
 		document.getElementById("info.vividcode.ext.applauncher.prefwindow.button.del").removeEventListener("command", al.prefs.onCmdDel, false);
@@ -146,9 +150,9 @@ info.vividcode.applauncher.prefs.cleanupPrefsWindow = function() {
 /**
  * 設定を取得し, 保存する
  */
-info.vividcode.applauncher.prefs.saveFromPrefsWindow = function() {
+applauncher.prefs.saveFromPrefsWindow = function() {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		var appInfoList = new Array();
 		// 設定画面の要素を取得
 		var elems = document.getElementById( al.prefs.PREFS_BOX_ID ).getElementsByTagNameNS( al.XUL_NS, "listitem" );
@@ -166,9 +170,9 @@ info.vividcode.applauncher.prefs.saveFromPrefsWindow = function() {
 /**
  * ユーザの設定画面に以前の設定を読み出す.
  */
-info.vividcode.applauncher.prefs.loadToPrefsWindow = function() {
+applauncher.prefs.loadToPrefsWindow = function() {
 	try {
-		var al = info.vividcode.applauncher;
+		var al = applauncher;
 		var appInfoList = al.prefs.loadAppInfoList();
 		// 設定画面の要素を取得
 		var listbox = document.getElementById( al.prefs.PREFS_BOX_ID );
@@ -181,13 +185,15 @@ info.vividcode.applauncher.prefs.loadToPrefsWindow = function() {
 	}
 };
 
-info.vividcode.applauncher.prefs.onLoad   = function(evt) {
-	info.vividcode.applauncher.prefs.initializePrefsWindow();
+var onLoad   = function(evt) {
+	applauncher.prefs.initializePrefsWindow();
 };
-info.vividcode.applauncher.prefs.onUnload = function(evt) {
-	info.vividcode.applauncher.prefs.cleanupPrefsWindow();
-	window.removeEventListener( "load",   info.vividcode.applauncher.prefs.onLoad,   false );
-	window.removeEventListener( "unload", info.vividcode.applauncher.prefs.onUnload, false );
+var onUnload = function(evt) {
+	applauncher.prefs.cleanupPrefsWindow();
+	window.removeEventListener( "load",   onLoad,   false );
+	window.removeEventListener( "unload", onUnload, false );
 };
-window.addEventListener( "load",   info.vividcode.applauncher.prefs.onLoad,   false );
-window.addEventListener( "unload", info.vividcode.applauncher.prefs.onUnload, false );
+window.addEventListener( "load",   onLoad,   false );
+window.addEventListener( "unload", onUnload, false );
+
+})(); // end the scope of the variables in this file

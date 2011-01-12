@@ -20,7 +20,9 @@
   try {
       // 初期化関数をロード時に実行する
       (function() {
-          //var manager = new info.vividcode.ext.applauncher.PrefsManager();
+          
+          // global variable [applauncher] is a namespace object of this package
+          
           /**
            * ファイル選択用ダイアログ
            */
@@ -35,14 +37,16 @@
                   // --- do something with the file here ---
               }
           };
+          
           var onClickArgInputBoxCreateButton = function(evt) {
-                  var al = info.vividcode.applauncher;
+                  var al = applauncher;
                   var argsBox = document.getElementById("info.vividcode.applauncher.prefwindow.edit.args");
                   argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) );
           };
+          
           var init = function() {
               try {
-                  var al = info.vividcode.applauncher;
+                  var al = applauncher;
                   window.moveToAlertPosition();
                   document.getElementById("info.vividcode.applauncher.prefwindow.edit.name").value = window.arguments[0].inn.name;
                   document.getElementById("info.vividcode.applauncher.prefwindow.edit.path").value = window.arguments[0].inn.path;
@@ -64,8 +68,9 @@
                   window.alert(e);
               }
           };
+          
           window.addEventListener("dialogaccept", function() {
-              var al = info.vividcode.applauncher;
+              var al = applauncher;
               var prefIdPrefix = "info.vividcode.applauncher.prefwindow.";
               window.arguments[0].inn.setName( document.getElementById(prefIdPrefix + "edit.name").value );
               window.arguments[0].inn.setPath( document.getElementById(prefIdPrefix + "edit.path").value );

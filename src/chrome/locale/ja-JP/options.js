@@ -1,15 +1,21 @@
-if( ! window.info ) { var info = {}; }
-if( ! info.vividcode ) { info.vividcode = {}; }
-if( ! info.vividcode.applauncher ) { info.vividcode.applauncher = {}; }
-if( ! info.vividcode.applauncher.locale ) { info.vividcode.applauncher.locale = {}; }
+// coding: utf-8
 
-info.vividcode.applauncher.locale.prefs = {};
-info.vividcode.applauncher.locale.prefs.errorMsg = {};
-info.vividcode.applauncher.locale.prefs.errorMsg.NO_SELECTED_ITEM = "選択されている項目がありません. 項目を選択してください.";
-info.vividcode.applauncher.locale.prefs.errorMsg.TOO_MUCH_SELECTED_ITEM = "2 つ以上のアイテムが選択されています. 1 つだけ選択するようにしてください.";
+/** namespace object */
+var applauncher = applauncher || {};
 
-info.vividcode.applauncher.locale.prefs.confMsg = {};
-info.vividcode.applauncher.locale.prefs.confMsg.DEL_CONF_TITLE = "設定を削除してよろしいですか？";
-info.vividcode.applauncher.locale.prefs.confMsg.DEL_CONF_MSG   = "選択されているアプリケーションの設定を削除してよろしいですか？";
-info.vividcode.applauncher.locale.prefs.confMsg.NOTSAVE_CONF_TITLE = "設定を保存せずに終了しますか？";
-info.vividcode.applauncher.locale.prefs.confMsg.NOTSAVE_CONF_MSG   = "設定の変更を保存せずに終了しますが, よろしいですか？";
+(function() { // begin the scope of the variables in this file
+
+applauncher.locale = applauncher.locale || {};
+
+applauncher.locale.prefs = {};
+applauncher.locale.prefs.errorMsg = {};
+applauncher.locale.prefs.errorMsg.NO_SELECTED_ITEM = "選択されている項目がありません. 項目を選択してください.";
+applauncher.locale.prefs.errorMsg.TOO_MUCH_SELECTED_ITEM = "2 つ以上のアイテムが選択されています. 1 つだけ選択するようにしてください.";
+
+applauncher.locale.prefs.confMsg = {};
+applauncher.locale.prefs.confMsg.DEL_CONF_TITLE = "設定を削除してよろしいですか？";
+applauncher.locale.prefs.confMsg.DEL_CONF_MSG   = "選択されているアプリケーションの設定を削除してよろしいですか？";
+applauncher.locale.prefs.confMsg.NOTSAVE_CONF_TITLE = "設定を保存せずに終了しますか？";
+applauncher.locale.prefs.confMsg.NOTSAVE_CONF_MSG   = "設定の変更を保存せずに終了しますが, よろしいですか？";
+
+})(); // end the scope of the variables in this file

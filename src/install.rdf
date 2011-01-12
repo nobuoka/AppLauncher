@@ -11,7 +11,7 @@
     <em:name>AppLauncher</em:name>
     <!-- 拡張機能のバージョン. 規則あり -->
     <!-- https://developer.mozilla.org/ja/Toolkit_version_format 参考？ -->
-    <em:version>0.8.3</em:version>
+    <em:version>0.8.4</em:version>
     <!-- 拡張機能の説明 -->
     <em:description>This extension lets you launch an external application through the context menu.</em:description>
     <!-- 拡張機能の開発者 -->
@@ -34,13 +34,13 @@
       </Description>
     </em:localized>
     
-    <!-- 拡張機能の対応アプリケーション. 下の例では Firefox 3.0 - 3.6.* に対応 -->
+    <!-- 拡張機能の対応アプリケーション. 下の例では Firefox 3.0 - 4.0.* に対応 -->
     <!-- cf. https://addons.mozilla.org/ja/firefox/pages/appversions/ -->
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox -->
         <em:minVersion>3.0</em:minVersion>
-        <em:maxVersion>4.0b7</em:maxVersion>
+        <em:maxVersion>4.0.*</em:maxVersion>
       </Description>
     </em:targetApplication>
     

@@ -13,6 +13,7 @@
              バージョン番号をそれぞれのバージョンの末尾に追加しました -->
         <RDF:li resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.2"/>
         <RDF:li resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.3"/>
+        <RDF:li resource="urn:mozilla:extension:applauncher@vividcode.info:0.8.4"/>
       </RDF:Seq>
     </em:updates>
     <em:signature>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAGVzQgcjj+YncZI
@@ -42,6 +43,18 @@
         <em:maxVersion>4.0b7</em:maxVersion>
         <em:updateLink>http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.3.ex-fx.xpi</em:updateLink>
         <em:updateHash>sha1:8475F658CC3A62C1BC22EC1864640332A625875A</em:updateHash>
+      </RDF:Description>
+    </em:targetApplication>
+  </RDF:Description>
+  <RDF:Description about="urn:mozilla:extension:applauncher@vividcode.info:0.8.4">
+    <em:version>0.8.4.ex</em:version>
+    <em:targetApplication>
+      <RDF:Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>3.0</em:minVersion>
+        <em:maxVersion>4.0.*</em:maxVersion>
+        <em:updateLink>http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.4.ex-fx.xpi</em:updateLink>
+        <em:updateHash>sha1:3762F4E90CDEF407F8592A33F08C88F9E6770E34</em:updateHash>
       </RDF:Description>
     </em:targetApplication>
   </RDF:Description>

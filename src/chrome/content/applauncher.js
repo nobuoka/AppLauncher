@@ -106,6 +106,13 @@ applauncher.getCurrentPageTURL = function( popupNode ) {
 };
 
 /**
+ * get selected text
+ */
+applauncher.getSelectedText = function getSelectedText() {
+	return content.getSelection().toString();
+};
+
+/**
  * 現在表示中のページのタイトルを返す関数.
  */
 applauncher.getCurrentPageTitle = function( popupNode ) {
@@ -129,6 +136,7 @@ applauncher.decodeEntityReference = function( str, popupNode ) {
 	var uri   = al.getCurrentPageURL( popupNode );
 	var turi  = al.getCurrentPageTURL( popupNode );
 	var title = al.getCurrentPageTitle( popupNode );
+	var text  = al.getSelectedText();
 	var imageurl = null;
 	return str.replace( /&[^&;]+;/g, function(substr) {
 		if ( substr == "&amp;" ) { return "&"; }
@@ -155,6 +163,8 @@ applauncher.decodeEntityReference = function( str, popupNode ) {
 			}
 		} else if ( substr == "&title;" ) { return title; }
 		else if ( substr == "&etitle;" ) { return encodeURIComponent(title); }
+		else if ( substr == "&text;" ) { return text; }
+		else if ( substr == "&etext;" ) { return encodeURIComponent(text); }
 	} );
 };
 

@@ -10,7 +10,7 @@
   <!-- コンテキストメニューへの追加: cf. https://developer.mozilla.org/ja/XUL/PopupGuide/Extensions -->
   <menupopup id="contentAreaContextMenu">
     <menuseparator id="info.vividcode.applauncher.contextmenu.separator" />
-    <menu id="info.vividcode.applauncher.contextmenu" label="AppLauncher">
+    <menu id="info.vividcode.applauncher.contextmenu" label="AppLauncher" class="menu-iconic" image="chrome://applauncher/content/applauncher_icon_16x16.png">
       <menupopup id="info.vividcode.applauncher.contextmenu.items">
         <!-- JavaScript ("launcher.js") によってこの部分に要素を追加する -->
       </menupopup>

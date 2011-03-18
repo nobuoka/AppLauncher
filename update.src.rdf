@@ -47,14 +47,14 @@
     </em:targetApplication>
   </RDF:Description>
   <RDF:Description about="urn:mozilla:extension:applauncher@vividcode.info:0.8.4">
-    <em:version>0.8.4.ex</em:version>
+    <em:version>0.8.4</em:version>
     <em:targetApplication>
       <RDF:Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>3.0</em:minVersion>
         <em:maxVersion>4.0.*</em:maxVersion>
-        <em:updateLink>http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.4.ex-fx.xpi</em:updateLink>
-        <em:updateHash>sha1:3762F4E90CDEF407F8592A33F08C88F9E6770E34</em:updateHash>
+        <em:updateLink>http://www.vividcode.info/projects/applauncher/pkg/applauncher-0.8.4-fx.xpi</em:updateLink>
+        <em:updateHash>sha1:D60BE10A9CCA3E5019245A751054D9E6C1E8E8BA</em:updateHash>
       </RDF:Description>
     </em:targetApplication>
   </RDF:Description>

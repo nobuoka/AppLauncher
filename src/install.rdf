@@ -11,7 +11,7 @@
     <em:name>AppLauncher</em:name>
     <!-- 拡張機能のバージョン. 規則あり -->
     <!-- https://developer.mozilla.org/ja/Toolkit_version_format 参考？ -->
-    <em:version>0.8.4</em:version>
+    <em:version>0.8.5</em:version>
     <!-- 拡張機能の説明 -->
     <em:description>This extension lets you launch an external application through the context menu.</em:description>
     <!-- 拡張機能の開発者 -->
@@ -22,11 +22,13 @@
     <!--<em:homepageURL>http://www.vividcode.info/projects/applauncher/</em:homepageURL>-->
     <!-- 拡張機能の設定に関する XUL ファイル. 無くても良い -->
     <em:optionsURL>chrome://applauncher/content/options.xul</em:optionsURL>
+    <!-- アイコン URL -->
+    <em:iconURL>chrome://applauncher/skin/icon_32x32.png</em:iconURL>
     
     <!-- 各地域の言語情報. 無くても良い -->
     <em:localized>
       <Description>
-        <em:locale>ja-JP</em:locale>
+        <em:locale>ja</em:locale>
         <em:name>AppLauncher</em:name>
         <em:description>この拡張機能を使うと、コンテキストメニューから外部アプリケーションを起動できます。</em:description>
         <em:creator>nobuoka</em:creator>

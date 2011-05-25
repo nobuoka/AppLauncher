@@ -109,7 +109,15 @@ applauncher.getCurrentPageTURL = function( popupNode ) {
  * get selected text
  */
 applauncher.getSelectedText = function getSelectedText() {
-	return content.getSelection().toString();
+	return (function getSelections( w ) {
+		var s, fs, i, len;
+		s = w.getSelection().toString();
+		fs = w.frames;
+		for( i = 0, len = fs.length; i < len; i++ ) {
+			s += getSelections( fs[i] );
+		}
+		return s;
+	})( content );
 };
 
 /**

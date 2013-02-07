@@ -4,6 +4,8 @@
 var applauncher = applauncher || {};
 
 (function() { // begin the scope of the variables in this file
+var Cc = Components.classes;
+var Ci = Components.interfaces;
 
 /** Namespace URI of XUL Elements */
 applauncher.XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
@@ -222,12 +224,29 @@ applauncher.launchOuterApplication = function( targetElem ) {
             args.push( array.join('') );
         }
 
-        // cf.https://developer.mozilla.org/ja/Code_snippets/Running_applications
-        // 実行可能ファイルに対する nsILocalFile を作成する
-        var file = Components.classes["@mozilla.org/file/local;1"].createInstance( Components.interfaces.nsILocalFile );
-        file.initWithPath( path );
+        var file;
+        if (path.substring(0,1) === ".") {
+            // if path starts with ".", it is treated as relative uri from
+            // current working directory
+            var directoryService = Cc["@mozilla.org/file/directory_service;1"].
+                                   getService(Ci.nsIProperties);
+            var curWorkDir = directoryService.get("CurWorkD", Ci.nsIFile);
+            var ioService = Cc['@mozilla.org/network/io-service;1'].
+                            getService(Ci.nsIIOService);
+            var curWorkDirUri = ioService.newFileURI(curWorkDir);
+            var pathUri = ioService.newURI(path, "UTF-8", curWorkDirUri);
+
+            var fileHandler = ioService.getProtocolHandler("file").
+                              QueryInterface(Ci.nsIFileProtocolHandler);
+            file = fileHandler.getFileFromURLSpec(pathUri.asciiSpec);
+        } else {
+            // create nsIFile object which represents file to be launched
+            // cf. https://developer.mozilla.org/ja/Code_snippets/Running_applications
+            file = Cc["@mozilla.org/file/local;1"].createInstance( Ci.nsIFile );
+            file.initWithPath( path );
+        }
         if( ! file.exists() ) {
-            throw new Error( al.locale.errorMsg.FILE_NOT_EXISTS + path );
+            throw new Error( al.locale.errorMsg.FILE_NOT_EXISTS + file.path );
         }
         // if the user uses Mac OS and the target application is a bundle application, get the execution file
         if( navigator.platform.indexOf("Mac") != -1 ) {

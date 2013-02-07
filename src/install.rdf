@@ -36,13 +36,13 @@
       </Description>
     </em:localized>
     
-    <!-- 拡張機能の対応アプリケーション. 下の例では Firefox 3.0 - 4.0.* に対応 -->
+    <!-- 拡張機能の対応アプリケーション -->
     <!-- cf. https://addons.mozilla.org/ja/firefox/pages/appversions/ -->
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox -->
-        <em:minVersion>3.6</em:minVersion>
-        <em:maxVersion>6.*</em:maxVersion>
+        <em:minVersion>14.0</em:minVersion>
+        <em:maxVersion>19.*</em:maxVersion>
       </Description>
     </em:targetApplication>
     

@@ -231,6 +231,8 @@ applauncher.launchOuterApplication = function( targetElem ) {
             var directoryService = Cc["@mozilla.org/file/directory_service;1"].
                                    getService(Ci.nsIProperties);
             var curWorkDir = directoryService.get("CurWorkD", Ci.nsIFile);
+            // conversion from file path to uri
+            // cf. http://piro.sakura.ne.jp/xul/tips/x0011.html
             var ioService = Cc['@mozilla.org/network/io-service;1'].
                             getService(Ci.nsIIOService);
             var curWorkDirUri = ioService.newFileURI(curWorkDir);

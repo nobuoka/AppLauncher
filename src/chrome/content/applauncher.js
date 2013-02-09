@@ -13,12 +13,15 @@ applauncher.XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.
 /**
  * Constructor of an Object that store the data of an external application
  */
-applauncher.AppInfo = function( name, path, args ) {
+applauncher.AppInfo = function( name, path, args, opts ) {
     const al = applauncher;
     this.name = name;
     this.path = path;
     this.args = args;
-    // 設定画面用の要素
+    if (!opts) opts = {};
+    this.opts = opts;
+
+    // 設定画面用の要素 (I'd like to isolate these DOM operation from AppInfo class)
     this.elemForPrefsWindow = document.createElementNS( al.XUL_NS, "listitem" );
     this.elemForPrefsWindow.elName = document.createElementNS(al.XUL_NS, "listcell");
     this.elemForPrefsWindow.appendChild( this.elemForPrefsWindow.elName ).setAttribute( "label", this.name );
@@ -26,6 +29,11 @@ applauncher.AppInfo = function( name, path, args ) {
     this.elemForPrefsWindow.appendChild( this.elemForPrefsWindow.elPath ).setAttribute( "label", this.path );
     this.elemForPrefsWindow.elArgs = document.createElementNS(al.XUL_NS, "listcell");
     this.elemForPrefsWindow.appendChild( this.elemForPrefsWindow.elArgs ).setAttribute( "label", this.args.join(", ") );
+    this.elemForPrefsWindow.elOpenInFx = (function () {
+        var e = document.createElementNS(al.XUL_NS, "listcell");
+        e.setAttribute("label", opts.openInFx ? "enabled" : "disabled");
+        this.elemForPrefsWindow.appendChild(e);
+    }).call(this);
     this.elemForPrefsWindow.appInfo = this;
 };
 
@@ -51,6 +59,11 @@ applauncher.AppInfo.prototype.setPath = function( path ) {
 applauncher.AppInfo.prototype.setArgs = function( args ) {
     this.args = args;
     this.elemForPrefsWindow.elArgs.setAttribute( "label", this.args.join(", ") );
+};
+
+applauncher.AppInfo.prototype.setOpenInFx = function (openInFx) {
+    this.opts = openInFx;
+    this.elemForPrefsWindow.elOpenInFx.setAttribute("label", openInFx ? "enabled" : "disabled");
 };
 
 /**
@@ -440,20 +453,26 @@ applauncher.prefs._loadAppPrefsVer1 = function( aPrefElem ) {
     return appInfoList;
 };
 
-applauncher.prefs._loadAppPrefsVer2 = function( aPrefElem ) {
+function convertToArrayFromArrayLikeObj(arrayLikeObj) {
+    return Array.prototype.slice.call(arrayLikeObj);
+}
+applauncher.prefs._loadAppPrefsVer2 = function ( aPrefElem ) {
     const al = applauncher;
-    var items = aPrefElem.getElementsByTagNameNS( al.prefs.PREFS_NS, "app" );
-    var appInfoList = new Array();
-    for( var i = 0; i < items.length; i++ ) {
-        var name = items[i].getElementsByTagNameNS( al.prefs.PREFS_NS, "name" ).item(0).textContent;
-        var path = items[i].getElementsByTagNameNS( al.prefs.PREFS_NS, "path" ).item(0).textContent;
-        var args = new Array();
-        var elems = items[i].getElementsByTagNameNS( al.prefs.PREFS_NS, "arg" );
-        for( var j = 0; j < elems.length; j++ ) {
-            args.push( elems[j].textContent );
-        }
-        appInfoList.push( new al.AppInfo( name, path, args ) );
-    }
+    var items = aPrefElem.getElementsByTagNameNS(al.prefs.PREFS_NS, "app");
+    items = convertToArrayFromArrayLikeObj(items);
+    var appInfoList = items.map(function (item) {
+        var name = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "name").item(0).textContent;
+        var path = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "path").item(0).textContent;
+        var args = (function () {
+            var argElems = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "arg");
+            argElems = convertToArrayFromArrayLikeObj(argElems);
+            return argElems.map(function (argElem) { return argElem.textContent });
+        }).call(this);
+        var optsElem = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "opts-json").item(0);
+        var opts = optsElem ? JSON.parseString(optsElem.textContent) : {};
+
+        return new al.AppInfo(name, path, args, opts);
+    });
     return appInfoList;
 };
 

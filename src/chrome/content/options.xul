@@ -19,19 +19,21 @@
   <script src="options.js"/>
   <!-- 実際の表示を規定 -->
   <vbox>
-    
+
     <hbox>
-      
+
       <listbox flex="1" id="info.vividcode.ext.applauncher.prefwindow.listbox">
         <listhead>
           <listheader label="&prefitem.header.name;" />
           <listheader label="&prefitem.header.path;" />
           <listheader label="&prefitem.header.args;" />
+          <listheader label="&prefitem.header.openInFx;" />
         </listhead>
         <listcols>
           <listcol/>
           <listcol flex="1"/>
-          <listcol flex="1"/>
+          <listcol flex="2"/>
+          <listcol/>
         </listcols>
         <!--
         <listitem>
@@ -41,7 +43,7 @@
         </listitem>
         -->
       </listbox>
-      
+
       <vbox>
         <button label="&prefitem.edt;" accesskey="E" id="info.vividcode.ext.applauncher.prefwindow.button.edt" />
         <button label="&prefitem.del;" accesskey="D" id="info.vividcode.ext.applauncher.prefwindow.button.del" />
@@ -49,8 +51,8 @@
         <button label="&prefitem.mvd;" accesskey="O" id="info.vividcode.ext.applauncher.prefwindow.button.mvd" />
         <button label="&prefitem.add;" accesskey="A" id="info.vividcode.ext.applauncher.prefwindow.button.add" />
       </vbox>
-      
+
     </hbox>
-    
+
   </vbox>
 </dialog>

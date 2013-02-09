@@ -13,12 +13,15 @@ applauncher.XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.
 /**
  * Constructor of an Object that store the data of an external application
  */
-applauncher.AppInfo = function( name, path, args ) {
+applauncher.AppInfo = function( name, path, args, opts ) {
     const al = applauncher;
     this.name = name;
     this.path = path;
     this.args = args;
-    // 設定画面用の要素
+    if (!opts) opts = {};
+    this.opts = opts;
+
+    // 設定画面用の要素 (I'd like to isolate these DOM operation from AppInfo class)
     this.elemForPrefsWindow = document.createElementNS( al.XUL_NS, "listitem" );
     this.elemForPrefsWindow.elName = document.createElementNS(al.XUL_NS, "listcell");
     this.elemForPrefsWindow.appendChild( this.elemForPrefsWindow.elName ).setAttribute( "label", this.name );
@@ -26,6 +29,11 @@ applauncher.AppInfo = function( name, path, args ) {
     this.elemForPrefsWindow.appendChild( this.elemForPrefsWindow.elPath ).setAttribute( "label", this.path );
     this.elemForPrefsWindow.elArgs = document.createElementNS(al.XUL_NS, "listcell");
     this.elemForPrefsWindow.appendChild( this.elemForPrefsWindow.elArgs ).setAttribute( "label", this.args.join(", ") );
+    this.elemForPrefsWindow.elOpenInFx = (function () {
+        var e = document.createElementNS(al.XUL_NS, "listcell");
+        e.setAttribute("label", opts.openInFx ? "enabled" : "disabled");
+        return this.elemForPrefsWindow.appendChild(e);
+    }).call(this);
     this.elemForPrefsWindow.appInfo = this;
 };
 
@@ -51,6 +59,11 @@ applauncher.AppInfo.prototype.setPath = function( path ) {
 applauncher.AppInfo.prototype.setArgs = function( args ) {
     this.args = args;
     this.elemForPrefsWindow.elArgs.setAttribute( "label", this.args.join(", ") );
+};
+
+applauncher.AppInfo.prototype.setOpenInFx = function (openInFx) {
+    this.opts.openInFx = openInFx;
+    this.elemForPrefsWindow.elOpenInFx.setAttribute("label", openInFx ? "enabled" : "disabled");
 };
 
 /**
@@ -179,6 +192,22 @@ applauncher.decodeEntityReference = function( str, popupNode ) {
     } );
 };
 
+applauncher.__runExecutableFile = function (file, args) {
+    // if the user uses Mac OS and the target application is a bundle application,
+    // get the execution file
+    if ( navigator.platform.indexOf("Mac") != -1 ) {
+        file.QueryInterface( Ci.nsILocalFileMac );
+        if ( file.isPackage ) {
+            file = al.getExecuteFileFromMacPackage( file );
+        }
+    }
+    // create a nsIProcess object, and run the process
+    var process = Cc["@mozilla.org/process/util;1"].createInstance( Ci.nsIProcess );
+    process.init( file );
+    process.run( false, args, args.length );
+            // if the first arg is true, wait for the process ending
+};
+
 /**
  * Launch an outer application.
  * 外部アプリケーションを起動する関数
@@ -250,17 +279,16 @@ applauncher.launchOuterApplication = function( targetElem ) {
         if( ! file.exists() ) {
             throw new Error( al.locale.errorMsg.FILE_NOT_EXISTS + file.path );
         }
-        // if the user uses Mac OS and the target application is a bundle application, get the execution file
-        if( navigator.platform.indexOf("Mac") != -1 ) {
-            file.QueryInterface( Components.interfaces.nsILocalFileMac );
-            if( file.isPackage ) {
-                file = al.getExecuteFileFromMacPackage( file );
-            }
+
+        if (appInfo.opts && appInfo.opts.openInFx) {
+            var ioService = Cc['@mozilla.org/network/io-service;1'].
+                            getService(Ci.nsIIOService);
+            var fileUri = ioService.newFileURI(file);
+            var newTab = gBrowser.addTab(fileUri.asciiSpec);
+            gBrowser.selectedTab = newTab;
+        } else {
+            al.__runExecutableFile(file, args);
         }
-        // create a nsIProcess object, and run the process
-        var process = Components.classes["@mozilla.org/process/util;1"].createInstance( Components.interfaces.nsIProcess );
-        process.init( file );
-        process.run( false, args, args.length ); // if the first arg is true, wait for the process ending
     } catch(e) {
         window.alert( "[AppLauncher error message]\n" + e.message );
     }
@@ -440,20 +468,26 @@ applauncher.prefs._loadAppPrefsVer1 = function( aPrefElem ) {
     return appInfoList;
 };
 
-applauncher.prefs._loadAppPrefsVer2 = function( aPrefElem ) {
+function convertToArrayFromArrayLikeObj(arrayLikeObj) {
+    return Array.prototype.slice.call(arrayLikeObj);
+}
+applauncher.prefs._loadAppPrefsVer2 = function ( aPrefElem ) {
     const al = applauncher;
-    var items = aPrefElem.getElementsByTagNameNS( al.prefs.PREFS_NS, "app" );
-    var appInfoList = new Array();
-    for( var i = 0; i < items.length; i++ ) {
-        var name = items[i].getElementsByTagNameNS( al.prefs.PREFS_NS, "name" ).item(0).textContent;
-        var path = items[i].getElementsByTagNameNS( al.prefs.PREFS_NS, "path" ).item(0).textContent;
-        var args = new Array();
-        var elems = items[i].getElementsByTagNameNS( al.prefs.PREFS_NS, "arg" );
-        for( var j = 0; j < elems.length; j++ ) {
-            args.push( elems[j].textContent );
-        }
-        appInfoList.push( new al.AppInfo( name, path, args ) );
-    }
+    var items = aPrefElem.getElementsByTagNameNS(al.prefs.PREFS_NS, "app");
+    items = convertToArrayFromArrayLikeObj(items);
+    var appInfoList = items.map(function (item) {
+        var name = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "name").item(0).textContent;
+        var path = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "path").item(0).textContent;
+        var args = (function () {
+            var argElems = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "arg");
+            argElems = convertToArrayFromArrayLikeObj(argElems);
+            return argElems.map(function (argElem) { return argElem.textContent });
+        }).call(this);
+        var optsElem = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "opts-json").item(0);
+        var opts = optsElem ? JSON.parse(optsElem.textContent) : {};
+
+        return new al.AppInfo(name, path, args, opts);
+    });
     return appInfoList;
 };
 
@@ -463,16 +497,23 @@ applauncher.prefs.saveAppInfoList = function( aAppInfoList ) {
     var prefNode  = document.implementation.createDocument( al.prefs.PREFS_NS, "appList", null );
     prefNode.documentElement.setAttribute( "ver", "2" );
     // 保存用 XML に値を追加していく
-    for( var i = 0; i < aAppInfoList.length; i++ ) {
+    aAppInfoList.forEach(function (appInfo) {
+        var e;
         var app = document.createElementNS( al.prefs.PREFS_NS, "app" );
-        app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "name") ).textContent = aAppInfoList[i].name;
-        app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "path") ).textContent = aAppInfoList[i].path;
+        e = document.createElementNS(al.prefs.PREFS_NS, "name");
+        app.appendChild(e).textContent = appInfo.name;
+        e = document.createElementNS(al.prefs.PREFS_NS, "path");
+        app.appendChild(e).textContent = appInfo.path;
         var args = app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "args") );
-        for( var j = 0; j < aAppInfoList[i].args.length; j++ ) {
-            args.appendChild( document.createElementNS(al.prefs.PREFS_NS, "arg") ).textContent = aAppInfoList[i].args[j];
+        for( var j = 0; j < appInfo.args.length; j++ ) {
+            args.appendChild( document.createElementNS(al.prefs.PREFS_NS, "arg") ).textContent = appInfo.args[j];
+        }
+        if (appInfo.opts) {
+            e = document.createElementNS(al.prefs.PREFS_NS, "opts-json");
+            app.appendChild(e).textContent = JSON.stringify(appInfo.opts);
         }
         prefNode.documentElement.appendChild(app);
-    }
+    });
     // DOM を XML 文にして保存
     // cf. https://developer.mozilla.org/ja/XMLSerializer
     var prefStr = new XMLSerializer().serializeToString(prefNode);

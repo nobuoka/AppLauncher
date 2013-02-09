@@ -29,21 +29,26 @@ try {
             try {
                 var al = applauncher;
                 window.moveToAlertPosition();
-                document.getElementById("info.vividcode.applauncher.prefwindow.edit.name").value = window.arguments[0].inn.name;
-                document.getElementById("info.vividcode.applauncher.prefwindow.edit.path").value = window.arguments[0].inn.path;
-                var argsBox = document.getElementById("info.vividcode.applauncher.prefwindow.edit.args");
-                for( var i = 0; i < window.arguments[0].inn.args.length; i++ ) {
-                    argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) ).value = window.arguments[0].inn.args[i];
+                var prefIdPrefix = "info.vividcode.applauncher.prefwindow.";
+                var appInfo = window.arguments[0].inn;
+                document.getElementById(prefIdPrefix + "edit.name").value = appInfo.name;
+                document.getElementById(prefIdPrefix + "edit.path").value = appInfo.path;
+                var argsBox = document.getElementById(prefIdPrefix + "edit.args");
+                for( var i = 0; i < appInfo.args.length; i++ ) {
+                    argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) ).value = appInfo.args[i];
                 }
                 // 最低でも 5 個のボックスは表示する. また, 空のボックスも 1 つおいておく
-                var rc = 5 - window.arguments[0].inn.args.length;
+                var rc = 5 - appInfo.args.length;
                 rc = ( rc > 1 ) ? rc : 1;
                 for( i = 0; i < rc; i++ ) {
                     argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) );
                 }
-                document.getElementById("info.vividcode.applauncher.prefwindow.edit.fileSelectButton").
+                document.getElementById(prefIdPrefix + "edit.opts.openInFx").checked =
+                            appInfo.opts.openInFx;
+
+                document.getElementById(prefIdPrefix + "edit.fileSelectButton").
                     addEventListener("command", function() { fileSelect(); }, false);
-                document.getElementById("info.vividcode.applauncher.prefwindow.edit.argInputBoxCreateButton").
+                document.getElementById(prefIdPrefix + "edit.argInputBoxCreateButton").
                     addEventListener("command", onClickArgInputBoxCreateButton, false);
             } catch(e) {
                 window.alert(e);
@@ -53,8 +58,9 @@ try {
         window.addEventListener("dialogaccept", function() {
             var al = applauncher;
             var prefIdPrefix = "info.vividcode.applauncher.prefwindow.";
-            window.arguments[0].inn.setName( document.getElementById(prefIdPrefix + "edit.name").value );
-            window.arguments[0].inn.setPath( document.getElementById(prefIdPrefix + "edit.path").value );
+            var appInfo = window.arguments[0].inn;
+            appInfo.setName( document.getElementById(prefIdPrefix + "edit.name").value );
+            appInfo.setPath( document.getElementById(prefIdPrefix + "edit.path").value );
             var argsElem = document.getElementById(prefIdPrefix + "edit.args").getElementsByTagNameNS( al.XUL_NS, "textbox" );
             var args = new Array();
             for( var i = 0; i < argsElem.length; i++ ) {
@@ -62,7 +68,8 @@ try {
                     args.push( argsElem[i].value );
                 }
             }
-            window.arguments[0].inn.setArgs( args );
+            appInfo.setArgs( args );
+            appInfo.setOpenInFx( document.getElementById(prefIdPrefix + "edit.opts.openInFx").checked );
             window.arguments[0].out = true;
         }, false);
         window.addEventListener("dialogcancel", function() {

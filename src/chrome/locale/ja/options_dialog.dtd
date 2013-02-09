@@ -1,1 +1,3 @@
 <!ENTITY dialog.title "アプリケーションの設定">
+<!ENTITY dialog.launcherSetting.name "設定名称">
+<!ENTITY dialog.launcherSetting.openInFx "Firefox で開く">

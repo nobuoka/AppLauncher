@@ -18,3 +18,4 @@
 <!ENTITY prefitem.header.name "Name">
 <!ENTITY prefitem.header.path "Path">
 <!ENTITY prefitem.header.args "Arguments">
+<!ENTITY prefitem.header.openInFx "Open in the Firefox">

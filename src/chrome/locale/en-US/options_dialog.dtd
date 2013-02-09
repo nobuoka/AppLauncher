@@ -1,1 +1,3 @@
 <!ENTITY dialog.title "Configure of an external application">
+<!ENTITY dialog.launcherSetting.name "Name">
+<!ENTITY dialog.launcherSetting.openInFx "Opne in the Firefox">

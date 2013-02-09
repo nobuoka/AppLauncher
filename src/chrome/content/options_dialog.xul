@@ -26,7 +26,8 @@
           </columns>
           <rows>
             <row>
-              <label control="info.vividcode.applauncher.prefwindow.edit.name" value="Name" />
+              <label control="info.vividcode.applauncher.prefwindow.edit.name"
+                  value="&dialog.launcherSetting.name;" />
               <textbox id="info.vividcode.applauncher.prefwindow.edit.name" />
             </row>
             <row>
@@ -44,6 +45,11 @@
               <vbox id="info.vividcode.applauncher.prefwindow.edit.args">
                 <!-- JavaScript program adds <textbox /> elements here. -->
               </vbox>
+            </row>
+            <row>
+              <label value="Options" />
+              <checkbox label="&dialog.launcherSetting.openInFx;" checked="false"
+                  id="info.vividcode.applauncher.prefwindow.edit.opts.openInFx" />
             </row>
           </rows>
         </grid>

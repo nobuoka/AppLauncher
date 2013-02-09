@@ -5,7 +5,7 @@
 <!--
   設定ダイアログ
     cf. dialog について: https://developer.mozilla.org/ja/XUL_Tutorial/Creating_Dialogs
-  変更内容: 
+  変更内容:
     ver.0.5: "edit", "delete" などのボタンを追加. 配置を調整.
 -->
 <dialog id="info.vividcode.applauncher.prefwindow" title="&prefwindow.title;"

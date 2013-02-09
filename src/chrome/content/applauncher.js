@@ -192,6 +192,22 @@ applauncher.decodeEntityReference = function( str, popupNode ) {
     } );
 };
 
+applauncher.__runExecutableFile = function (file, args) {
+    // if the user uses Mac OS and the target application is a bundle application,
+    // get the execution file
+    if ( navigator.platform.indexOf("Mac") != -1 ) {
+        file.QueryInterface( Ci.nsILocalFileMac );
+        if ( file.isPackage ) {
+            file = al.getExecuteFileFromMacPackage( file );
+        }
+    }
+    // create a nsIProcess object, and run the process
+    var process = Cc["@mozilla.org/process/util;1"].createInstance( Ci.nsIProcess );
+    process.init( file );
+    process.run( false, args, args.length );
+            // if the first arg is true, wait for the process ending
+};
+
 /**
  * Launch an outer application.
  * 外部アプリケーションを起動する関数
@@ -263,17 +279,16 @@ applauncher.launchOuterApplication = function( targetElem ) {
         if( ! file.exists() ) {
             throw new Error( al.locale.errorMsg.FILE_NOT_EXISTS + file.path );
         }
-        // if the user uses Mac OS and the target application is a bundle application, get the execution file
-        if( navigator.platform.indexOf("Mac") != -1 ) {
-            file.QueryInterface( Components.interfaces.nsILocalFileMac );
-            if( file.isPackage ) {
-                file = al.getExecuteFileFromMacPackage( file );
-            }
+
+        if (appInfo.opts && appInfo.opts.openInFx) {
+            var ioService = Cc['@mozilla.org/network/io-service;1'].
+                            getService(Ci.nsIIOService);
+            var fileUri = ioService.newFileURI(file);
+            var newTab = gBrowser.addTab(fileUri.asciiSpec);
+            gBrowser.selectedTab = newTab;
+        } else {
+            al.__runExecutableFile(file, args);
         }
-        // create a nsIProcess object, and run the process
-        var process = Components.classes["@mozilla.org/process/util;1"].createInstance( Components.interfaces.nsIProcess );
-        process.init( file );
-        process.run( false, args, args.length ); // if the first arg is true, wait for the process ending
     } catch(e) {
         window.alert( "[AppLauncher error message]\n" + e.message );
     }

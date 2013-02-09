@@ -2,7 +2,7 @@
 <!-- Install Manifests の説明 : https://developer.mozilla.org/ja/Install_Manifests -->
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
-    
+
     <!-- 拡張機能を一意に識別するための ID. メールアドレス形式か GUID 形式 -->
     <em:id>applauncher@vividcode.info</em:id>
     <!-- アドオンのタイプ. 拡張機能であれば 2 -->
@@ -11,11 +11,11 @@
     <em:name>AppLauncher</em:name>
     <!-- 拡張機能のバージョン. 規則あり -->
     <!-- https://developer.mozilla.org/ja/Toolkit_version_format 参考？ -->
-    <em:version>0.8.7</em:version>
+    <em:version>0.9.0beta1</em:version>
     <!-- 拡張機能の説明 -->
     <em:description>This extension lets you launch an external application through the context menu.</em:description>
     <!-- 拡張機能の開発者 -->
-    <em:creator>nobuoka</em:creator>
+    <em:creator>NOBUOKA Yu</em:creator>
     <!-- 共同開発者？ -->
     <!--<em:contributor></em:contributor>-->
     <!-- 拡張機能を配布したりするための web ページアドレス -->
@@ -24,18 +24,18 @@
     <em:optionsURL>chrome://applauncher/content/options.xul</em:optionsURL>
     <!-- アイコン URL -->
     <em:iconURL>chrome://applauncher/skin/icon_32x32.png</em:iconURL>
-    
+
     <!-- 各地域の言語情報. 無くても良い -->
     <em:localized>
       <Description>
         <em:locale>ja</em:locale>
         <em:name>AppLauncher</em:name>
         <em:description>この拡張機能を使うと、コンテキストメニューから外部アプリケーションを起動できます。</em:description>
-        <em:creator>nobuoka</em:creator>
+        <em:creator>NOBUOKA Yu</em:creator>
         <em:homepageURL>http://www.vividcode.info/projects/applauncher/</em:homepageURL>
       </Description>
     </em:localized>
-    
+
     <!-- 拡張機能の対応アプリケーション -->
     <!-- cf. https://addons.mozilla.org/ja/firefox/pages/appversions/ -->
     <em:targetApplication>
@@ -45,6 +45,6 @@
         <em:maxVersion>19.*</em:maxVersion>
       </Description>
     </em:targetApplication>
-    
+
   </Description>
 </RDF>

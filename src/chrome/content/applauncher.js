@@ -560,4 +560,4 @@ applauncher.prefs.setCharPref = function( prefName, prefValue ) {
     prefBranch.setCharPref( prefName, unescape(encodeURIComponent(prefValue)) );
 };
 
-})(); // end the scope of the variables in this file
+}).call(this); // end the scope of the variables in this file

@@ -469,7 +469,7 @@ applauncher.prefs._loadAppPrefsVer2 = function ( aPrefElem ) {
             return argElems.map(function (argElem) { return argElem.textContent });
         }).call(this);
         var optsElem = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "opts-json").item(0);
-        var opts = optsElem ? JSON.parseString(optsElem.textContent) : {};
+        var opts = optsElem ? JSON.parse(optsElem.textContent) : {};
 
         return new al.AppInfo(name, path, args, opts);
     });
@@ -482,16 +482,23 @@ applauncher.prefs.saveAppInfoList = function( aAppInfoList ) {
     var prefNode  = document.implementation.createDocument( al.prefs.PREFS_NS, "appList", null );
     prefNode.documentElement.setAttribute( "ver", "2" );
     // 保存用 XML に値を追加していく
-    for( var i = 0; i < aAppInfoList.length; i++ ) {
+    aAppInfoList.forEach(function (appInfo) {
+        var e;
         var app = document.createElementNS( al.prefs.PREFS_NS, "app" );
-        app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "name") ).textContent = aAppInfoList[i].name;
-        app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "path") ).textContent = aAppInfoList[i].path;
+        e = document.createElementNS(al.prefs.PREFS_NS, "name");
+        app.appendChild(e).textContent = appInfo.name;
+        e = document.createElementNS(al.prefs.PREFS_NS, "path");
+        app.appendChild(e).textContent = appInfo.path;
         var args = app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "args") );
-        for( var j = 0; j < aAppInfoList[i].args.length; j++ ) {
-            args.appendChild( document.createElementNS(al.prefs.PREFS_NS, "arg") ).textContent = aAppInfoList[i].args[j];
+        for( var j = 0; j < appInfo.args.length; j++ ) {
+            args.appendChild( document.createElementNS(al.prefs.PREFS_NS, "arg") ).textContent = appInfo.args[j];
+        }
+        if (appInfo.opts) {
+            e = document.createElementNS(al.prefs.PREFS_NS, "opts-json");
+            app.appendChild(e).textContent = JSON.stringify(appInfo.opts);
         }
         prefNode.documentElement.appendChild(app);
-    }
+    });
     // DOM を XML 文にして保存
     // cf. https://developer.mozilla.org/ja/XMLSerializer
     var prefStr = new XMLSerializer().serializeToString(prefNode);

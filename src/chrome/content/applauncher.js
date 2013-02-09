@@ -299,10 +299,10 @@ applauncher.launchOuterApplication = function( targetElem ) {
  * @see http://d.hatena.ne.jp/teramako/20110111/p1 (japanese)
  */
 applauncher.getExecuteFileFromMacPackage = function( aFile ) {
-    var infoPlistFile = aFile.clone().QueryInterface( Components.interfaces.nsILocalFile );
+    var infoPlistFile = aFile.clone().QueryInterface( Ci.nsIFile );
     infoPlistFile.appendRelativePath( "Contents/Info.plist" );
-    var ifstream  = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance( Components.interfaces.nsIFileInputStream );
-    var domparser = Components.classes["@mozilla.org/xmlextras/domparser;1"].createInstance( Components.interfaces.nsIDOMParser );
+    var ifstream  = Cc["@mozilla.org/network/file-input-stream;1"].createInstance( Ci.nsIFileInputStream );
+    var domparser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance( Ci.nsIDOMParser );
     ifstream.init( infoPlistFile, -1, 0, 0 );
     var doc = domparser.parseFromStream( ifstream, "UTF-8", infoPlistFile.fileSize, "application/xml" );
     ifstream.close();
@@ -314,7 +314,7 @@ applauncher.getExecuteFileFromMacPackage = function( aFile ) {
             break;
         }
     }
-    var exeFile = aFile.clone().QueryInterface( Components.interfaces.nsILocalFile );
+    var exeFile = aFile.clone().QueryInterface( Ci.nsIFile );
     exeFile.appendRelativePath( "Contents/MacOS/" + exeFileName );
     return exeFile;
 };

@@ -48,7 +48,8 @@
             </row>
             <row>
               <label value="Options" />
-              <checkbox label="&dialog.launcherSetting.openInFx;" checked="false" />
+              <checkbox label="&dialog.launcherSetting.openInFx;" checked="false"
+                  id="info.vividcode.applauncher.prefwindow.edit.opts.openInFx" />
             </row>
           </rows>
         </grid>

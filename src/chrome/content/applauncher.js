@@ -32,7 +32,7 @@ applauncher.AppInfo = function( name, path, args, opts ) {
     this.elemForPrefsWindow.elOpenInFx = (function () {
         var e = document.createElementNS(al.XUL_NS, "listcell");
         e.setAttribute("label", opts.openInFx ? "enabled" : "disabled");
-        this.elemForPrefsWindow.appendChild(e);
+        return this.elemForPrefsWindow.appendChild(e);
     }).call(this);
     this.elemForPrefsWindow.appInfo = this;
 };
@@ -62,7 +62,7 @@ applauncher.AppInfo.prototype.setArgs = function( args ) {
 };
 
 applauncher.AppInfo.prototype.setOpenInFx = function (openInFx) {
-    this.opts = openInFx;
+    this.opts.openInFx = openInFx;
     this.elemForPrefsWindow.elOpenInFx.setAttribute("label", openInFx ? "enabled" : "disabled");
 };
 

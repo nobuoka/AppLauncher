@@ -1,5 +1,18 @@
 // coding: utf-8
 
+declare var gBrowser;
+declare var Components;
+declare var content;
+declare var escape;
+declare var unescape;
+
+interface Document {
+    popupNode: any;
+}
+
+declare var DOMParser;
+declare var XMLSerializer;
+
 /** namespace object */
 var applauncher = applauncher || {};
 
@@ -14,7 +27,7 @@ applauncher.XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.
  * Constructor of an Object that store the data of an external application
  */
 applauncher.AppInfo = function( name, path, args, opts ) {
-    const al = applauncher;
+    var al = applauncher;
     this.name = name;
     this.path = path;
     this.args = args;
@@ -104,7 +117,7 @@ applauncher.getImageURL = function( popupNode ) {
 };
 
 applauncher.getCurrentPageTURL = function( popupNode ) {
-    const al = applauncher;
+    var al = applauncher;
     // turi の設定
     // turi は右クリックのリンク先 URI. 右クリックしたのがリンク要素じゃなければそのページの URI
     var turi = null;
@@ -156,7 +169,7 @@ applauncher.getCurrentPageTitle = function( popupNode ) {
  * Decode the entity references in XML string.
  */
 applauncher.decodeEntityReference = function( str, popupNode ) {
-    const al = applauncher;
+    var al = applauncher;
     var uri   = al.getCurrentPageURL( popupNode );
     var turi  = al.getCurrentPageTURL( popupNode );
     var title = al.getCurrentPageTitle( popupNode );
@@ -193,6 +206,7 @@ applauncher.decodeEntityReference = function( str, popupNode ) {
 };
 
 applauncher.__runExecutableFile = function (file, args) {
+    var al = applauncher;
     // if the user uses Mac OS and the target application is a bundle application,
     // get the execution file
     if ( navigator.platform.indexOf("Mac") != -1 ) {
@@ -213,7 +227,7 @@ applauncher.__runExecutableFile = function (file, args) {
  * 外部アプリケーションを起動する関数
  */
 applauncher.launchOuterApplication = function( targetElem ) {
-    const al = applauncher;
+    var al = applauncher;
     var appInfo = targetElem.appInfo;
     // popupNode の取得: 前者は Fx3.6 以前用, 後者は Fx4.0 以降用 (Fx4.0 以降でも前者で OK の模様)
     var popupNode = document.popupNode || targetElem.parentNode.parentNode.parentNode.triggerNode;
@@ -327,17 +341,17 @@ applauncher.onCmdToLaunchApp = function( evt ) {
     }
 };
 applauncher.createContextMenuItem = function( appInfo ) {
-    const al = applauncher;
+    var al = applauncher;
     // "menuitem" 要素の作成
     var item = document.createElementNS( al.XUL_NS, "menuitem" );
     item.setAttribute( "label", appInfo.name );
     // イベントリスナの追加
-    item.appInfo  = appInfo;
+    (<any>item).appInfo = appInfo;
     item.addEventListener( "command", al.onCmdToLaunchApp, false );
     return item;
 };
 applauncher.destroyContextMenuItem = function( item ) {
-    const al = applauncher;
+    var al = applauncher;
     item.appInfo  = null;
     item.removeEventListener( "command", al.onCmdToLaunchApp, false );
 };
@@ -352,7 +366,7 @@ applauncher.onCmdToOpenPrefWindow = function( evt ) {
  */
 applauncher.initializeContextMenu = function() {
     try {
-        const al = applauncher;
+        var al = applauncher;
         // 設定の読み込み
         var appInfoList = al.prefs.loadAppInfoList();
         // コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
@@ -414,7 +428,7 @@ applauncher.initializeContextMenuInAllWindow = function() {
 
 applauncher.cleanupContextMenu = function() {
     try {
-        const al = applauncher;
+        var al = applauncher;
         // コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
         var menupopup = document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
         if( menupopup ) {
@@ -438,7 +452,7 @@ applauncher.prefs.PREFS_BOX_ID  = "info.vividcode.ext.applauncher.prefwindow.lis
 applauncher.prefs.PREFS_NS      = "http://www.vividcode.info/firefox_addon/myextensions/applauncher/";
 
 applauncher.prefs.loadAppInfoList = function() {
-    const al = applauncher;
+    var al = applauncher;
     // 以前の設定を DOM として取得
     var parser  = new DOMParser();
     var prefStr = al.prefs.getPref("appList");
@@ -456,7 +470,7 @@ applauncher.prefs.loadAppInfoList = function() {
 };
 
 applauncher.prefs._loadAppPrefsVer1 = function( aPrefElem ) {
-    const al = applauncher;
+    var al = applauncher;
     var items = aPrefElem.getElementsByTagNameNS( al.prefs.PREFS_NS, "app" );
     var appInfoList = new Array();
     for( var i = 0; i < items.length; i++ ) {
@@ -472,7 +486,7 @@ function convertToArrayFromArrayLikeObj(arrayLikeObj) {
     return Array.prototype.slice.call(arrayLikeObj);
 }
 applauncher.prefs._loadAppPrefsVer2 = function ( aPrefElem ) {
-    const al = applauncher;
+    var al = applauncher;
     var items = aPrefElem.getElementsByTagNameNS(al.prefs.PREFS_NS, "app");
     items = convertToArrayFromArrayLikeObj(items);
     var appInfoList = items.map(function (item) {
@@ -492,7 +506,7 @@ applauncher.prefs._loadAppPrefsVer2 = function ( aPrefElem ) {
 };
 
 applauncher.prefs.saveAppInfoList = function( aAppInfoList ) {
-    const al = applauncher;
+    var al = applauncher;
     // 保存用の XML Document を新たに生成
     var prefNode  = document.implementation.createDocument( al.prefs.PREFS_NS, "appList", null );
     prefNode.documentElement.setAttribute( "ver", "2" );
@@ -526,7 +540,7 @@ applauncher.prefs.saveAppInfoList = function( aAppInfoList ) {
  * @see : https://developer.mozilla.org/Ja/Code_snippets/Preferences
  */
 applauncher.prefs.getPref = function( prefName ) {
-    const al = applauncher;
+    var al = applauncher;
     // 設定の情報を取得する XPCOM オブジェクトの生成
     var prefSvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
     var prefBranch = prefSvc.getBranch( al.prefs.BRANCH_STRING );
@@ -553,7 +567,7 @@ applauncher.prefs.getPref = function( prefName ) {
  * @see : https://developer.mozilla.org/Ja/Code_snippets/Preferences
  */
 applauncher.prefs.setCharPref = function( prefName, prefValue ) {
-    const al = applauncher;
+    var al = applauncher;
     // 設定の情報を取得する XPCOM オブジェクトの生成
     var prefSvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
     var prefBranch = prefSvc.getBranch( al.prefs.BRANCH_STRING );

@@ -1,6 +1,7 @@
 // coding: utf-8 (これは UTF-8 の文書です)
 
 // global variable [applauncher] is a namespace object of this package
+declare var applauncher;
 
 (function() { // begin the scope of the variables in this file
 

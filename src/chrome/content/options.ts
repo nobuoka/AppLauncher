@@ -1,6 +1,11 @@
 // coding: utf-8
 
+interface Window {
+    openDialog(a,b,c,d);
+}
+
 // global variable [applauncher] is a namespace object of this package
+declare var applauncher;
 
 (function() { // begin the scope of the variables in this file
 
@@ -9,7 +14,7 @@
  */
 applauncher.prefs.getSelectedAppInfo = function() {
 	var al = applauncher;
-	var listbox = document.getElementById( al.prefs.PREFS_BOX_ID );
+	var listbox = <any>document.getElementById( al.prefs.PREFS_BOX_ID );
 	var items = listbox.selectedItems;
 	// 選択項目が無い
 	if( items.length == 0 ) {
@@ -157,7 +162,7 @@ applauncher.prefs.saveFromPrefsWindow = function() {
 		// 設定画面の要素を取得
 		var elems = document.getElementById( al.prefs.PREFS_BOX_ID ).getElementsByTagNameNS( al.XUL_NS, "listitem" );
 		for( var i = 0; i < elems.length; i++ ) {
-			appInfoList.push( elems.item(i).appInfo );
+			appInfoList.push( (<any>elems.item(i)).appInfo );
 		}
 		al.prefs.saveAppInfoList( appInfoList );
 		// コンテキストメニューを初期化する

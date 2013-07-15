@@ -1,3 +1,14 @@
+// In this script, `window` is a dialog
+// See: http://mdn.beonex.com/en/XUL/dialog.html
+interface Window {
+    arguments: any[];
+    moveToAlertPosition(): void;
+    // there is other properties and methods...
+}
+declare var Components;
+
+declare var applauncher;
+
 try {
     // 初期化関数をロード時に実行する
     (function() {
@@ -14,7 +25,7 @@ try {
             var res = fp.show();
             if( res == nsIFilePicker.returnOK ) {
                 var file = fp.file;
-                document.getElementById("info.vividcode.applauncher.prefwindow.edit.path").value = file.path;
+                (<any>document.getElementById("info.vividcode.applauncher.prefwindow.edit.path")).value = file.path;
                 // --- do something with the file here ---
             }
         };
@@ -31,11 +42,11 @@ try {
                 window.moveToAlertPosition();
                 var prefIdPrefix = "info.vividcode.applauncher.prefwindow.";
                 var appInfo = window.arguments[0].inn;
-                document.getElementById(prefIdPrefix + "edit.name").value = appInfo.name;
-                document.getElementById(prefIdPrefix + "edit.path").value = appInfo.path;
+                (<any>document.getElementById(prefIdPrefix + "edit.name")).value = appInfo.name;
+                (<any>document.getElementById(prefIdPrefix + "edit.path")).value = appInfo.path;
                 var argsBox = document.getElementById(prefIdPrefix + "edit.args");
                 for( var i = 0; i < appInfo.args.length; i++ ) {
-                    argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) ).value = appInfo.args[i];
+                    (<any>argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) )).value = appInfo.args[i];
                 }
                 // 最低でも 5 個のボックスは表示する. また, 空のボックスも 1 つおいておく
                 var rc = 5 - appInfo.args.length;
@@ -43,7 +54,7 @@ try {
                 for( i = 0; i < rc; i++ ) {
                     argsBox.appendChild( document.createElementNS( al.XUL_NS, "textbox" ) );
                 }
-                document.getElementById(prefIdPrefix + "edit.opts.openInFx").checked =
+                (<any>document.getElementById(prefIdPrefix + "edit.opts.openInFx")).checked =
                             appInfo.opts.openInFx;
 
                 document.getElementById(prefIdPrefix + "edit.fileSelectButton").
@@ -59,17 +70,17 @@ try {
             var al = applauncher;
             var prefIdPrefix = "info.vividcode.applauncher.prefwindow.";
             var appInfo = window.arguments[0].inn;
-            appInfo.setName( document.getElementById(prefIdPrefix + "edit.name").value );
-            appInfo.setPath( document.getElementById(prefIdPrefix + "edit.path").value );
+            appInfo.setName( (<any>document.getElementById(prefIdPrefix + "edit.name")).value );
+            appInfo.setPath( (<any>document.getElementById(prefIdPrefix + "edit.path")).value );
             var argsElem = document.getElementById(prefIdPrefix + "edit.args").getElementsByTagNameNS( al.XUL_NS, "textbox" );
             var args = new Array();
             for( var i = 0; i < argsElem.length; i++ ) {
-                if( argsElem[i].value ) {
-                    args.push( argsElem[i].value );
+                if( (<any>argsElem[i]).value ) {
+                    args.push( (<any>argsElem[i]).value );
                 }
             }
             appInfo.setArgs( args );
-            appInfo.setOpenInFx( document.getElementById(prefIdPrefix + "edit.opts.openInFx").checked );
+            appInfo.setOpenInFx( (<any>document.getElementById(prefIdPrefix + "edit.opts.openInFx")).checked );
             window.arguments[0].out = true;
         }, false);
         window.addEventListener("dialogcancel", function() {

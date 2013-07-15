@@ -1,3 +1,8 @@
+interface Window {
+    arguments: any[];
+    moveToAlertPosition();
+}
+
 try {
   // 初期化関数をロード時に実行する
   (function() {
@@ -5,8 +10,8 @@ try {
       var init = function() {
           try {
               document.documentElement.setAttribute("title", window.arguments[0].title);
-              document.documentElement.appendChild(
-                  document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "label") ).
+              (<any>document.documentElement.appendChild(
+                  document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "label") )).
                       setAttribute("value", window.arguments[0].message);
               window.moveToAlertPosition();
           } catch(e) {

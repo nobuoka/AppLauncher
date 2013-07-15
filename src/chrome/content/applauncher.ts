@@ -468,138 +468,134 @@ module applauncher {
     }
 }
 
-(function() { // begin the scope of the variables in this file
+module applauncher.prefs {
+    /** 設定を表示している listbox 要素の id */
+    export var BRANCH_STRING = "extensions.applauncher.";
+    export var PREFS_BOX_ID  = "info.vividcode.ext.applauncher.prefwindow.listbox";
 
-// 設定関係
-applauncher.prefs = {};
+    /** AppLauncher の設定保存用 XML が使用する名前空間 */
+    export var PREFS_NS = "http://www.vividcode.info/firefox_addon/myextensions/applauncher/";
 
-/** 設定を表示している listbox 要素の id */
-applauncher.prefs.BRANCH_STRING = "extensions.applauncher."
-applauncher.prefs.PREFS_BOX_ID  = "info.vividcode.ext.applauncher.prefwindow.listbox";
-/** AppLauncher の設定保存用 XML が使用する名前空間 */
-applauncher.prefs.PREFS_NS      = "http://www.vividcode.info/firefox_addon/myextensions/applauncher/";
-
-applauncher.prefs.loadAppInfoList = function() {
-    var al = applauncher;
-    // 以前の設定を DOM として取得
-    var parser  = new DOMParser();
-    var prefStr = al.prefs.getPref("appList");
-    // 初めて起動する場合, prefStr は undefined になっている
-    if( ! prefStr ) {
-        prefStr = "<appList ver=\"2\" xmlns=\"http://www.vividcode.info/firefox_addon/myextensions/applauncher/\" />";
+    export function loadAppInfoList() {
+        var al = applauncher;
+        // 以前の設定を DOM として取得
+        var parser  = new DOMParser();
+        var prefStr = al.prefs.getPref("appList");
+        // 初めて起動する場合, prefStr は undefined になっている
+        if (!prefStr) {
+            prefStr = "<appList ver=\"2\" xmlns=\"http://www.vividcode.info/firefox_addon/myextensions/applauncher/\" />";
+        }
+        var appList = parser.parseFromString( prefStr, "text/xml" );
+        var version = appList.documentElement.getAttribute("ver");
+        if (version == null) {
+            return al.prefs._loadAppPrefsVer1( appList );
+        } else if (version == "2") {
+            return al.prefs._loadAppPrefsVer2( appList );
+        }
     }
-    var appList = parser.parseFromString( prefStr, "text/xml" );
-    var version = appList.documentElement.getAttribute("ver");
-    if( version == null ) {
-        return al.prefs._loadAppPrefsVer1( appList );
-    } else if( version == "2" ) {
-        return al.prefs._loadAppPrefsVer2( appList );
-    }
-};
 
-applauncher.prefs._loadAppPrefsVer1 = function( aPrefElem ) {
-    var al = applauncher;
-    var items = aPrefElem.getElementsByTagNameNS( al.prefs.PREFS_NS, "app" );
-    var appInfoList = new Array();
-    for( var i = 0; i < items.length; i++ ) {
-        var name = items[i].getAttribute("name");
-        var path = items[i].getAttribute("path");
-        var args = items[i].getAttribute("args").split("<>");
-        appInfoList.push( new al.AppInfo( name, path, args ) );
+    export function _loadAppPrefsVer1(aPrefElem: Document) {
+        var al = applauncher;
+        var items: NodeListOf<Element> = <any>aPrefElem.getElementsByTagNameNS(al.prefs.PREFS_NS, "app");
+        var appInfoList: applauncher.AppInfo[] = [];
+        for (var i = 0; i < items.length; i++) {
+            var name = items[i].getAttribute("name");
+            var path = items[i].getAttribute("path");
+            var args = items[i].getAttribute("args").split("<>");
+            appInfoList.push( new al.AppInfo( name, path, args ) );
+        }
+        return appInfoList;
     }
-    return appInfoList;
-};
 
-function convertToArrayFromArrayLikeObj(arrayLikeObj) {
-    return Array.prototype.slice.call(arrayLikeObj);
+    function convertToArrayFromArrayLikeObj(arrayLikeObj) {
+        return Array.prototype.slice.call(arrayLikeObj);
+    }
+    export function _loadAppPrefsVer2(aPrefElem: Document) {
+        var al = applauncher;
+        var itemList = aPrefElem.getElementsByTagNameNS(al.prefs.PREFS_NS, "app");
+        var items = convertToArrayFromArrayLikeObj(itemList);
+        var appInfoList = items.map(function (item) {
+            var name = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "name").item(0).textContent;
+            var path = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "path").item(0).textContent;
+            var args = (function () {
+                var argElems = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "arg");
+                argElems = convertToArrayFromArrayLikeObj(argElems);
+                return argElems.map(function (argElem) { return argElem.textContent });
+            }).call(this);
+            var optsElem = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "opts-json").item(0);
+            var opts = optsElem ? JSON.parse(optsElem.textContent) : {};
+
+            return new al.AppInfo(name, path, args, opts);
+        });
+        return appInfoList;
+    }
+
+    export function saveAppInfoList(aAppInfoList: applauncher.AppInfo[]) {
+        var al = applauncher;
+        // 保存用の XML Document を新たに生成
+        var prefNode  = document.implementation.createDocument( al.prefs.PREFS_NS, "appList", null );
+        prefNode.documentElement.setAttribute( "ver", "2" );
+        // 保存用 XML に値を追加していく
+        aAppInfoList.forEach(function (appInfo) {
+            var e;
+            var app = document.createElementNS( al.prefs.PREFS_NS, "app" );
+            e = document.createElementNS(al.prefs.PREFS_NS, "name");
+            app.appendChild(e).textContent = appInfo.name;
+            e = document.createElementNS(al.prefs.PREFS_NS, "path");
+            app.appendChild(e).textContent = appInfo.path;
+            var args = app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "args") );
+            for( var j = 0; j < appInfo.args.length; j++ ) {
+                args.appendChild( document.createElementNS(al.prefs.PREFS_NS, "arg") ).textContent = appInfo.args[j];
+            }
+            if (appInfo.opts) {
+                e = document.createElementNS(al.prefs.PREFS_NS, "opts-json");
+                app.appendChild(e).textContent = JSON.stringify(appInfo.opts);
+            }
+            prefNode.documentElement.appendChild(app);
+        });
+        // DOM を XML 文にして保存
+        // cf. https://developer.mozilla.org/ja/XMLSerializer
+        var prefStr = new XMLSerializer().serializeToString(prefNode);
+        al.prefs.setCharPref("appList", prefStr);
+    }
+
+    /**
+     * Preference 情報を取得する関数 (設定の情報)
+     * @param prefString 取得するキー
+     * @see : https://developer.mozilla.org/Ja/Code_snippets/Preferences
+     */
+    export function getPref(prefName: string) {
+        var al = applauncher;
+        // 設定の情報を取得する XPCOM オブジェクトの生成
+        var prefSvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+        var prefBranch = prefSvc.getBranch( al.prefs.BRANCH_STRING );
+        // タイプ別に取得する関数を分ける
+        switch ( prefBranch.getPrefType(prefName) ) {
+            // 設定値が文字の場合
+            case Components.interfaces.nsIPrefBranch.PREF_STRING:
+                return decodeURIComponent(escape( prefBranch.getCharPref(prefName) ));
+                break;
+            // 設定値が数値の場合
+            case Components.interfaces.nsIPrefBranch.PREF_INT:
+                return prefBranch.getIntPref(prefName);
+                break;
+            // 設定値が真偽値の場合
+            case Components.interfaces.nsIPrefBranch.PREF_BOOL:
+                return prefBranch.getBoolPref(prefName);
+                break;
+        }
+    }
+
+    /**
+     * Preference 情報を取得する関数 (設定の情報)
+     * @param prefString 取得するキー
+     * @see : https://developer.mozilla.org/Ja/Code_snippets/Preferences
+     */
+    export function setCharPref(prefName: string, prefValue) {
+        var al = applauncher;
+        // 設定の情報を取得する XPCOM オブジェクトの生成
+        var prefSvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+        var prefBranch = prefSvc.getBranch( al.prefs.BRANCH_STRING );
+        prefBranch.setCharPref( prefName, unescape(encodeURIComponent(prefValue)) );
+    }
 }
-applauncher.prefs._loadAppPrefsVer2 = function ( aPrefElem ) {
-    var al = applauncher;
-    var items = aPrefElem.getElementsByTagNameNS(al.prefs.PREFS_NS, "app");
-    items = convertToArrayFromArrayLikeObj(items);
-    var appInfoList = items.map(function (item) {
-        var name = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "name").item(0).textContent;
-        var path = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "path").item(0).textContent;
-        var args = (function () {
-            var argElems = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "arg");
-            argElems = convertToArrayFromArrayLikeObj(argElems);
-            return argElems.map(function (argElem) { return argElem.textContent });
-        }).call(this);
-        var optsElem = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "opts-json").item(0);
-        var opts = optsElem ? JSON.parse(optsElem.textContent) : {};
-
-        return new al.AppInfo(name, path, args, opts);
-    });
-    return appInfoList;
-};
-
-applauncher.prefs.saveAppInfoList = function( aAppInfoList ) {
-    var al = applauncher;
-    // 保存用の XML Document を新たに生成
-    var prefNode  = document.implementation.createDocument( al.prefs.PREFS_NS, "appList", null );
-    prefNode.documentElement.setAttribute( "ver", "2" );
-    // 保存用 XML に値を追加していく
-    aAppInfoList.forEach(function (appInfo) {
-        var e;
-        var app = document.createElementNS( al.prefs.PREFS_NS, "app" );
-        e = document.createElementNS(al.prefs.PREFS_NS, "name");
-        app.appendChild(e).textContent = appInfo.name;
-        e = document.createElementNS(al.prefs.PREFS_NS, "path");
-        app.appendChild(e).textContent = appInfo.path;
-        var args = app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "args") );
-        for( var j = 0; j < appInfo.args.length; j++ ) {
-            args.appendChild( document.createElementNS(al.prefs.PREFS_NS, "arg") ).textContent = appInfo.args[j];
-        }
-        if (appInfo.opts) {
-            e = document.createElementNS(al.prefs.PREFS_NS, "opts-json");
-            app.appendChild(e).textContent = JSON.stringify(appInfo.opts);
-        }
-        prefNode.documentElement.appendChild(app);
-    });
-    // DOM を XML 文にして保存
-    // cf. https://developer.mozilla.org/ja/XMLSerializer
-    var prefStr = new XMLSerializer().serializeToString(prefNode);
-    al.prefs.setCharPref("appList", prefStr);
-};
-
-/**
- * Preference 情報を取得する関数 (設定の情報)
- * @param prefString 取得するキー
- * @see : https://developer.mozilla.org/Ja/Code_snippets/Preferences
- */
-applauncher.prefs.getPref = function( prefName ) {
-    var al = applauncher;
-    // 設定の情報を取得する XPCOM オブジェクトの生成
-    var prefSvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
-    var prefBranch = prefSvc.getBranch( al.prefs.BRANCH_STRING );
-    // タイプ別に取得する関数を分ける
-    switch( prefBranch.getPrefType(prefName) ) {
-        // 設定値が文字の場合
-        case Components.interfaces.nsIPrefBranch.PREF_STRING:
-            return decodeURIComponent(escape( prefBranch.getCharPref(prefName) ));
-            break;
-        // 設定値が数値の場合
-        case Components.interfaces.nsIPrefBranch.PREF_INT:
-            return prefBranch.getIntPref(prefName);
-            break;
-        // 設定値が真偽値の場合
-        case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-            return prefBranch.getBoolPref(prefName);
-            break;
-    }
-};
-
-/**
- * Preference 情報を取得する関数 (設定の情報)
- * @param prefString 取得するキー
- * @see : https://developer.mozilla.org/Ja/Code_snippets/Preferences
- */
-applauncher.prefs.setCharPref = function( prefName, prefValue ) {
-    var al = applauncher;
-    // 設定の情報を取得する XPCOM オブジェクトの生成
-    var prefSvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
-    var prefBranch = prefSvc.getBranch( al.prefs.BRANCH_STRING );
-    prefBranch.setCharPref( prefName, unescape(encodeURIComponent(prefValue)) );
-};
-
-}).call(this); // end the scope of the variables in this file

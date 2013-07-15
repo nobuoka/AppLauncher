@@ -1,28 +1,15 @@
-// coding: utf-8 (これは UTF-8 の文書です)
+///<reference path=".\applauncher.ts" />
 
-// global variable [applauncher] is a namespace object of this package
-declare var applauncher;
+window.addEventListener("load", function el(evt) {
+    if (document !== evt.target) return;
+    window.removeEventListener("load", el, false);
 
-(function() { // begin the scope of the variables in this file
+    applauncher.initializeContextMenu();
+}, false );
 
-/**
- * Load Event Listener.
- */
-var onLoad = function( evt ) {
-	applauncher.initializeContextMenu();
-}
+window.addEventListener("unload", function el(evt) {
+    if (document !== evt.target) return;
+    window.removeEventListener("unload", el, false);
 
-/**
- * Unload Event Listener.
- */
-var onUnload = function( evt ) {
-	applauncher.cleanupContextMenu();
-	window.removeEventListener( "load",   onLoad,   false );
-	window.removeEventListener( "unload", onUnload, false );
-}
-
-// add event listener
-window.addEventListener( "load",   onLoad,   false );
-window.addEventListener( "unload", onUnload, false );
-
-})(); // end the scope of the variables in this file
+    applauncher.cleanupContextMenu();
+}, false );

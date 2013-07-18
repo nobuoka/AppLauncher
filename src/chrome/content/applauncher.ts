@@ -2,16 +2,52 @@
 
 declare var gBrowser;
 declare var Components;
-declare var content;
+declare var content: Window;
 declare var escape;
 declare var unescape;
 
 interface Document {
-    popupNode: any;
+    popupNode: Node;
 }
 
-declare var DOMParser;
-declare var XMLSerializer;
+module moz {
+    /**
+     * See: https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsISupports
+     */
+    export interface nsISupports { // XXX incomplete
+        // XXX Does `QueryInterface` method return value?
+        QueryInterface(uuid): any;
+    }
+
+    /**
+     * See: https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIFile
+     */
+    export interface nsIFile extends nsISupports { // XXX incomplete
+        /** Requires Gecko 14 */
+        initWithPath(filePath: string): void;
+        /** Requires Gecko 14 */
+        appendRelativePath(relativeFilePath: string): void;
+        path: string;
+        fileSize: number;
+        exists(): boolean;
+        clone(): nsIFile;
+    }
+
+    /**
+     * See: https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsILocalFileMac
+     */
+    export interface nsILocalFileMac extends nsIFile { // XXX incomplete
+        isPackage(): boolean;
+    }
+
+    /**
+     * See: https://developer.mozilla.org/en-US/docs/XPCOM_Interface_Reference/nsIProcess
+     */
+    export interface nsIProcess extends nsISupports {
+        init(executable: nsIFile): void;
+        run(blocking: boolean, args: string[], count: number): void;
+    }
+}
 
 /** namespace object */
 module applauncher {
@@ -21,7 +57,6 @@ module applauncher {
     /** Namespace URI of XUL Elements */
     export var XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-    export var prefs: any;
     export declare var locale: any;
 
     export interface ElemForPrefsWindow extends Element {
@@ -107,7 +142,7 @@ module applauncher {
     /**
      * 現在表示中のページの URL を返す関数.
      */
-    export function getCurrentPageURL( popupNode? ) {
+    export function getCurrentPageURL(popupNode?: Node): string {
         // アクティブなウィンドウの取得
         // cf. https://developer.mozilla.org/Ja/Code_snippets/Tabbed_browser
         /*
@@ -120,7 +155,7 @@ module applauncher {
         return content.location.href;
     }
 
-    export function getImageURL( popupNode ) {
+    export function getImageURL(popupNode: Node): string {
         var al = applauncher;
         // turi の設定
         // turi は右クリックのリンク先 URI. 右クリックしたのがリンク要素じゃなければそのページの URI
@@ -131,7 +166,7 @@ module applauncher {
             targetNode = targetNode.parentNode;
         }
         if ( targetNode != null && targetNode.nodeName.toUpperCase() == "IMG" ) {
-            imageurl = targetNode.src;
+            imageurl = (<HTMLImageElement>targetNode).src;
         } else {
             // when the img element is not found
             throw new Error( al.locale.errorMsg.IMG_ELEM_NOT_FOUND );
@@ -141,17 +176,17 @@ module applauncher {
         return imageurl;
     }
 
-    export function getCurrentPageTURL( popupNode ) {
+    export function getCurrentPageTURL(popupNode: Node): string {
         var al = applauncher;
         // turi の設定
         // turi は右クリックのリンク先 URI. 右クリックしたのがリンク要素じゃなければそのページの URI
-        var turi = null;
+        var turi: string;
         var targetNode = popupNode;
         while ( targetNode != null && targetNode.nodeName.toUpperCase() != "A" ) {
             targetNode = targetNode.parentNode;
         }
         if ( targetNode != null && targetNode.nodeName.toUpperCase() == "A" ) {
-            turi = targetNode.href;
+            turi = (<HTMLAnchorElement>targetNode).href;
         } else {
             turi = al.getCurrentPageURL();
         }
@@ -161,23 +196,23 @@ module applauncher {
     /**
      * get selected text
      */
-    export function getSelectedText() {
-        return (function getSelections( w ) {
-            var s, fs, i, len, sel;
+    export function getSelectedText(): string {
+        return (function getSelections(w: Window): string {
+            var s: string, fs: Window, i: number, len: number, sel: Selection;
             sel = w.getSelection(); // w.getSelection() は null の可能性あり (?)
             s = ( sel === null ? "" : sel.toString() );
             fs = w.frames;
-            for( i = 0, len = fs.length; i < len; i++ ) {
+            for (i = 0, len = fs.length; i < len; ++i) {
                 s += getSelections( fs[i] );
             }
             return s;
-        })( content );
+        }).call(this, content);
     }
 
     /**
      * 現在表示中のページのタイトルを返す関数.
      */
-    export function getCurrentPageTitle( popupNode ) {
+    export function getCurrentPageTitle(popupNode: Node): string {
         // アクティブなウィンドウの取得
         // cf. https://developer.mozilla.org/Ja/Code_snippets/Tabbed_browser
         /*
@@ -193,14 +228,14 @@ module applauncher {
     /**
      * Decode the entity references in XML string.
      */
-    export function decodeEntityReference( str, popupNode ) {
+    export function decodeEntityReference(str: string, popupNode: Node): string {
         var al = applauncher;
-        var uri   = al.getCurrentPageURL( popupNode );
-        var turi  = al.getCurrentPageTURL( popupNode );
-        var title = al.getCurrentPageTitle( popupNode );
-        var text  = al.getSelectedText();
+        var uri: string   = al.getCurrentPageURL( popupNode );
+        var turi: string  = al.getCurrentPageTURL( popupNode );
+        var title: string = al.getCurrentPageTitle( popupNode );
+        var text: string  = al.getSelectedText();
         var imageurl = null;
-        return str.replace( /&[^&;]+;/g, function(substr) {
+        return str.replace( /&[^&;]+;/g, function (substr: string) {
             if ( substr == "&amp;" ) { return "&"; }
             else if ( substr == "&lt;" ) { return "<"; }
             else if ( substr == "&gt;" ) { return ">"; }
@@ -211,15 +246,15 @@ module applauncher {
             else if ( substr == "&turl;" ) { return turi; }
             else if ( substr == "&eturl;" ) { return encodeURIComponent(turi); }
             else if ( substr == "&imageurl;" ) {
-                if(! imageurl) { imageurl = al.getImageURL(popupNode) };
+                if (!imageurl) { imageurl = al.getImageURL(popupNode) };
                 return imageurl;
-            } else if ( substr == "&eimageurl;" ) {
-                if(! imageurl) { imageurl = al.getImageURL(popupNode) };
+            } else if (substr === "&eimageurl;") {
+                if (!imageurl) { imageurl = al.getImageURL(popupNode) };
                 return encodeURIComponent(imageurl);
             } else if ( substr == "&ImgFilePathWin;" ) {
-                if(! imageurl) { imageurl = al.getImageURL(popupNode) };
-                if( imageurl.match(/^file:\/\/\//) ) {
-                    return imageurl.replace( /^file:\/\/\//, "" ).replace( /\//g, "\\" );
+                if (!imageurl) { imageurl = al.getImageURL(popupNode) };
+                if (imageurl.match(/^file:\/\/\//)) {
+                    return imageurl.replace(/^file:\/\/\//, "").replace(/\//g, "\\");
                 } else {
                     throw new Error( al.locale.errorMsg.IMG_FILE_ISNT_LOCAL_FILE );
                 }
@@ -230,39 +265,44 @@ module applauncher {
         } );
     }
 
-    function __runExecutableFile(file, args) {
+    function __runExecutableFile(file: moz.nsIFile, args: string[]): void {
         var al = applauncher;
         // if the user uses Mac OS and the target application is a bundle application,
         // get the execution file
         if ( navigator.platform.indexOf("Mac") != -1 ) {
             file.QueryInterface( Ci.nsILocalFileMac );
-            if ( file.isPackage ) {
-                file = al.getExecuteFileFromMacPackage( file );
+            var macFile = <moz.nsILocalFileMac>file;
+            if ( macFile.isPackage ) { // `isPackage` is property? (not method?)
+                file = al.getExecuteFileFromMacPackage( macFile );
             }
         }
         // create a nsIProcess object, and run the process
-        var process = Cc["@mozilla.org/process/util;1"].createInstance( Ci.nsIProcess );
-        process.init( file );
-        process.run( false, args, args.length );
+        var process = <moz.nsIProcess>Cc["@mozilla.org/process/util;1"].createInstance( Ci.nsIProcess );
+        process.init(file);
+        process.run(false, args, args.length);
                 // if the first arg is true, wait for the process ending
+    }
+
+    interface XULMenupopupElement extends Element {
+        triggerNode: Node;
     }
 
     /**
      * Launch an outer application.
      * 外部アプリケーションを起動する関数
      */
-    export function launchOuterApplication( targetElem ) {
+    function launchOuterApplication(targetElem: XULMenuitemElementWithAppInfo) {
         var al = applauncher;
         var appInfo = targetElem.appInfo;
         // popupNode の取得: 前者は Fx3.6 以前用, 後者は Fx4.0 以降用 (Fx4.0 以降でも前者で OK の模様)
-        var popupNode = document.popupNode || targetElem.parentNode.parentNode.parentNode.triggerNode;
+        var popupNode = document.popupNode || (<XULMenupopupElement>targetElem.parentNode.parentNode.parentNode).triggerNode;
         try {
             var path = appInfo.path;
             var argsSource = appInfo.args;
             // 設定値の取得
             //var path = AppLauncher.getPref("path");
             var argsList = "";
-            var args = new Array();
+            var args: string[] = [];
             for( var i = 0; i < argsSource.length; i++ ) {
                 // 文字コード変換とエンティティリファレンスのデコード
                 var uc = Components.classes['@mozilla.org/intl/scriptableunicodeconverter']
@@ -292,7 +332,7 @@ module applauncher {
                 args.push( array.join('') );
             }
 
-            var file;
+            var file: moz.nsIFile;
             if (path.substring(0,1) === ".") {
                 // if path starts with ".", it is treated as relative uri from
                 // current working directory
@@ -315,7 +355,7 @@ module applauncher {
                 file = Cc["@mozilla.org/file/local;1"].createInstance( Ci.nsIFile );
                 file.initWithPath( path );
             }
-            if( ! file.exists() ) {
+            if (!file.exists()) {
                 throw new Error( al.locale.errorMsg.FILE_NOT_EXISTS + file.path );
             }
 
@@ -337,8 +377,8 @@ module applauncher {
      * Get the execution file path from a bundle application file. (for MacOS)
      * @see http://d.hatena.ne.jp/teramako/20110111/p1 (japanese)
      */
-    export function getExecuteFileFromMacPackage( aFile ) {
-        var infoPlistFile = aFile.clone().QueryInterface( Ci.nsIFile );
+    export function getExecuteFileFromMacPackage(aFile: moz.nsILocalFileMac): moz.nsIFile {
+        var infoPlistFile = <moz.nsIFile>aFile.clone().QueryInterface( Ci.nsIFile );
         infoPlistFile.appendRelativePath( "Contents/Info.plist" );
         var ifstream  = Cc["@mozilla.org/network/file-input-stream;1"].createInstance( Ci.nsIFileInputStream );
         var domparser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance( Ci.nsIDOMParser );
@@ -347,38 +387,42 @@ module applauncher {
         ifstream.close();
         var keys = doc.getElementsByTagName( "key" );
         var exeFileName = "";
-        for( var i = 0, key; key = keys[i]; i++ ){
-            if( key.textContent == "CFBundleExecutable" ) {
+        for (var i = 0, key; key = keys[i]; ++i) {
+            if (key.textContent == "CFBundleExecutable") {
                 exeFileName = key.nextElementSibling.textContent;
                 break;
             }
         }
-        var exeFile = aFile.clone().QueryInterface( Ci.nsIFile );
-        exeFile.appendRelativePath( "Contents/MacOS/" + exeFileName );
+        var exeFile = <moz.nsIFile>aFile.clone().QueryInterface(Ci.nsIFile);
+        exeFile.appendRelativePath("Contents/MacOS/" + exeFileName);
         return exeFile;
     }
 
-    export function onCmdToLaunchApp( evt ) {
+    interface XULMenuitemElementWithAppInfo extends Element {
+        appInfo: AppInfo;
+    }
+    function onCmdToLaunchApp(evt: Event): void {
         try {
-            applauncher.launchOuterApplication( evt.currentTarget );
+            var targetElem = <XULMenuitemElementWithAppInfo>evt.currentTarget;
+            launchOuterApplication(targetElem);
         } catch (e) {
             window.alert(e);
         }
     }
-    export function createContextMenuItem( appInfo ) {
+    function createContextMenuItem(appInfo: AppInfo): Element {
         var al = applauncher;
         // "menuitem" 要素の作成
-        var item = document.createElementNS( al.XUL_NS, "menuitem" );
-        item.setAttribute( "label", appInfo.name );
+        var item = <XULMenuitemElementWithAppInfo>document.createElementNS( al.XUL_NS, "menuitem" );
+        item.setAttribute("label", appInfo.name);
         // イベントリスナの追加
-        (<any>item).appInfo = appInfo;
-        item.addEventListener( "command", al.onCmdToLaunchApp, false );
+        item.appInfo = appInfo;
+        item.addEventListener("command", onCmdToLaunchApp, false);
         return item;
     }
-    export function destroyContextMenuItem( item ) {
+    function destroyContextMenuItem(item: Element): void {
         var al = applauncher;
-        item.appInfo  = null;
-        item.removeEventListener( "command", al.onCmdToLaunchApp, false );
+        if ((<any>item).appInfo) delete (<any>item).appInfo;
+        item.removeEventListener("command", onCmdToLaunchApp, false);
     }
     export function onCmdToOpenPrefWindow( evt ) {
         // 設定ウィンドウを表示
@@ -389,11 +433,11 @@ module applauncher {
      * Initialize an AppLauncher item in the context menu.
      * コンテキストメニューの初期化を行う関数
      */
-    export function initializeContextMenu() {
+    export function initializeContextMenu(): void {
         try {
             var al = applauncher;
             // 設定の読み込み
-            var appInfoList = al.prefs.loadAppInfoList();
+            var appInfoList: AppInfo[] = al.prefs.loadAppInfoList();
             // コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
             var menupopup = document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
             if ( menupopup ) {
@@ -403,8 +447,8 @@ module applauncher {
                 }
                 // 要素を追加
                 if ( appInfoList != null && appInfoList.length != 0 ) {
-                    for (var i = 0; i < appInfoList.length; i++) {
-                        menupopup.appendChild( al.createContextMenuItem(appInfoList[i]) );
+                    for (var i = 0; i < appInfoList.length; ++i) {
+                        menupopup.appendChild( createContextMenuItem(appInfoList[i]) );
                     }
                 } else {
                     // 設定項目が存在しないときのメッセージを追加
@@ -431,7 +475,7 @@ module applauncher {
      * Initialize AppLauncher items in context menus on all ChromeWindows.
      * 全ての ChromeWindow のコンテキストメニュー内にある AppLauncher に関する項目を初期化する
      */
-    export function initializeContextMenuInAllWindow() {
+    export function initializeContextMenuInAllWindow(): void {
         try {
             // 全ての ChromeWindow に対して処理を行う
             var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
@@ -451,15 +495,15 @@ module applauncher {
         }
     }
 
-    export function cleanupContextMenu() {
+    export function cleanupContextMenu(): void {
         try {
             var al = applauncher;
             // コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
             var menupopup = document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
             if ( menupopup ) {
-                var items = menupopup.getElementsByTagNameNS( al.XUL_NS, "menuitem" );
-                for (var i = 0; i < items.length - 1; i++) {
-                    al.destroyContextMenuItem( items.item(i) );
+                var items = <NodeListOf<Element>>menupopup.getElementsByTagNameNS(al.XUL_NS, "menuitem");
+                for (var i = 0; i < items.length - 1; ++i) {
+                    destroyContextMenuItem( items.item(i) );
                 }
             }
         } catch (e) {
@@ -476,7 +520,7 @@ module applauncher.prefs {
     /** AppLauncher の設定保存用 XML が使用する名前空間 */
     export var PREFS_NS = "http://www.vividcode.info/firefox_addon/myextensions/applauncher/";
 
-    export function loadAppInfoList() {
+    export function loadAppInfoList(): AppInfo[] {
         var al = applauncher;
         // 以前の設定を DOM として取得
         var parser  = new DOMParser();
@@ -488,13 +532,13 @@ module applauncher.prefs {
         var appList = parser.parseFromString( prefStr, "text/xml" );
         var version = appList.documentElement.getAttribute("ver");
         if (version == null) {
-            return al.prefs._loadAppPrefsVer1( appList );
+            return _loadAppPrefsVer1( appList );
         } else if (version == "2") {
-            return al.prefs._loadAppPrefsVer2( appList );
+            return _loadAppPrefsVer2( appList );
         }
     }
 
-    export function _loadAppPrefsVer1(aPrefElem: Document) {
+    function _loadAppPrefsVer1(aPrefElem: Document): AppInfo[] {
         var al = applauncher;
         var items: NodeListOf<Element> = <any>aPrefElem.getElementsByTagNameNS(al.prefs.PREFS_NS, "app");
         var appInfoList: applauncher.AppInfo[] = [];
@@ -507,20 +551,20 @@ module applauncher.prefs {
         return appInfoList;
     }
 
-    function convertToArrayFromArrayLikeObj(arrayLikeObj) {
+    function convertToArrayFromArrayLikeObj(arrayLikeObj): any[] {
         return Array.prototype.slice.call(arrayLikeObj);
     }
-    export function _loadAppPrefsVer2(aPrefElem: Document) {
+    function _loadAppPrefsVer2(aPrefElem: Document) {
         var al = applauncher;
         var itemList = aPrefElem.getElementsByTagNameNS(al.prefs.PREFS_NS, "app");
         var items = convertToArrayFromArrayLikeObj(itemList);
-        var appInfoList = items.map(function (item) {
+        var appInfoList = items.map((item) => {
             var name = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "name").item(0).textContent;
             var path = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "path").item(0).textContent;
             var args = (function () {
                 var argElems = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "arg");
                 argElems = convertToArrayFromArrayLikeObj(argElems);
-                return argElems.map(function (argElem) { return argElem.textContent });
+                return argElems.map((argElem) => { return argElem.textContent });
             }).call(this);
             var optsElem = item.getElementsByTagNameNS(al.prefs.PREFS_NS, "opts-json").item(0);
             var opts = optsElem ? JSON.parse(optsElem.textContent) : {};
@@ -530,23 +574,24 @@ module applauncher.prefs {
         return appInfoList;
     }
 
-    export function saveAppInfoList(aAppInfoList: applauncher.AppInfo[]) {
+    export function saveAppInfoList(aAppInfoList: applauncher.AppInfo[]): void {
         var al = applauncher;
         // 保存用の XML Document を新たに生成
         var prefNode  = document.implementation.createDocument( al.prefs.PREFS_NS, "appList", null );
         prefNode.documentElement.setAttribute( "ver", "2" );
         // 保存用 XML に値を追加していく
-        aAppInfoList.forEach(function (appInfo) {
-            var e;
+        aAppInfoList.forEach((appInfo) => {
+            var e: Element;
             var app = document.createElementNS( al.prefs.PREFS_NS, "app" );
             e = document.createElementNS(al.prefs.PREFS_NS, "name");
             app.appendChild(e).textContent = appInfo.name;
             e = document.createElementNS(al.prefs.PREFS_NS, "path");
             app.appendChild(e).textContent = appInfo.path;
             var args = app.appendChild( document.createElementNS(al.prefs.PREFS_NS, "args") );
-            for( var j = 0; j < appInfo.args.length; j++ ) {
-                args.appendChild( document.createElementNS(al.prefs.PREFS_NS, "arg") ).textContent = appInfo.args[j];
-            }
+            appInfo.args.forEach((arg) => {
+                e = document.createElementNS(al.prefs.PREFS_NS, "arg");
+                args.appendChild(e).textContent = arg;
+            });
             if (appInfo.opts) {
                 e = document.createElementNS(al.prefs.PREFS_NS, "opts-json");
                 app.appendChild(e).textContent = JSON.stringify(appInfo.opts);
@@ -562,9 +607,9 @@ module applauncher.prefs {
     /**
      * Preference 情報を取得する関数 (設定の情報)
      * @param prefString 取得するキー
-     * @see : https://developer.mozilla.org/Ja/Code_snippets/Preferences
+     * @see : https://developer.mozilla.org/ja/docs/Code_snippets/Preferences
      */
-    export function getPref(prefName: string) {
+    export function getPref(prefName: string): any {
         var al = applauncher;
         // 設定の情報を取得する XPCOM オブジェクトの生成
         var prefSvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
@@ -589,9 +634,9 @@ module applauncher.prefs {
     /**
      * Preference 情報を取得する関数 (設定の情報)
      * @param prefString 取得するキー
-     * @see : https://developer.mozilla.org/Ja/Code_snippets/Preferences
+     * @see : https://developer.mozilla.org/ja/docs/Code_snippets/Preferences
      */
-    export function setCharPref(prefName: string, prefValue) {
+    export function setCharPref(prefName: string, prefValue: string): void {
         var al = applauncher;
         // 設定の情報を取得する XPCOM オブジェクトの生成
         var prefSvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);

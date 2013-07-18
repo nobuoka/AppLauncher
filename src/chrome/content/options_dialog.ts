@@ -7,7 +7,6 @@ interface Window {
     moveToAlertPosition(): void;
     // there is other properties and methods...
 }
-declare var Components;
 
 // 初期化関数をロード時に実行する
 (function() {

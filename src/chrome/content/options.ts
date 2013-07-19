@@ -6,6 +6,9 @@ interface Window {
 }
 
 module applauncher.prefs {
+    /** 設定を表示している listbox 要素の id */
+    var PREFS_BOX_ID = "info.vividcode.ext.applauncher.prefwindow.listbox";
+
     interface XULListbox extends Element {
         selectedItem: applauncher.ElemForPrefsWindow;
         selectedItems: applauncher.ElemForPrefsWindow[];

@@ -1,0 +1,7 @@
+{
+    "name": "applauncher-dev",
+    "private": true,
+    "dependencies": {
+        "typescript": ">=0.9.0-1"
+    }
+}

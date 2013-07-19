@@ -20,7 +20,7 @@ Build
 
 * [Ruby](http://www.ruby-lang.org/)
   * [bundler](http://rubygems.org/gems/bundler) (Ruby gem)
-* [tsc command](http://www.typescriptlang.org/) (TypeScript compiler)
+* [Node.js](http://nodejs.org/)
 
 ### Set up
 
@@ -30,10 +30,16 @@ Install gems:
 bundle install
 ```
 
+Install node modules:
+
+```
+npm install
+```
+
 ### Build
 
 ```
-bundle exec rake
+PATH=`npm bin`:$PATH bundle exec rake
 ```
 
 License

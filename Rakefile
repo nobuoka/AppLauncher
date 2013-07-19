@@ -6,6 +6,11 @@ TSC = 'tsc'
 
 task :default => [:build]
 
+def check_ts_sourced_js(pathname)
+  return false if pathname.extname != '.js'
+  File.exist? pathname.dirname.join(pathname.basename('.js').to_s + '.ts')
+end
+
 # 指定のディレクトリ (複数) の中にあるファイル全てを
 # 別のディレクトリの中にコピーするためのタスクを定義する。
 def setup_filecopy_task(taskname, obj_dir_path_str, src_dir_path_strs)
@@ -19,11 +24,18 @@ def setup_filecopy_task(taskname, obj_dir_path_str, src_dir_path_strs)
       dist_str = dist.to_s
       if pathname.extname == '.ts'
         # TODO ts ファイルが参照する外部スクリプトに対する依存関係も考慮する
-        dist = dist.dirname.join(pathname.basename('.ts').to_s + '.js')
-        dist_str = dist.to_s
-        file dist_str => [ dist.dirname.to_s, src_str ] do |t|
-          sh "#{TSC} --out #{t.name} #{t.prerequisites[1]}"
+        js_filename_str = pathname.basename('.ts').to_s + '.js'
+        src_js = pathname.dirname.join(js_filename_str)
+        dst_js = dist.dirname.join(js_filename_str)
+        file src_js.to_s => [ src_str ] do |t|
+          sh "#{TSC} #{t.prerequisites[0]}"
         end
+        file dst_js.to_s => [ dist.dirname.to_s, src_js.to_s ] do |t|
+          cp t.prerequisites[1], t.name
+        end
+        dist = dst_js
+      elsif check_ts_sourced_js(pathname)
+        # do nothing
       elsif pathname.directory?
         directory dist_str
       else

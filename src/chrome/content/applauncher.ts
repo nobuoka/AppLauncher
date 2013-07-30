@@ -1,3 +1,4 @@
+///<reference path="..\locale\applauncher.d.ts" />
 // coding: utf-8
 
 declare var gBrowser;
@@ -56,8 +57,6 @@ module applauncher {
 
     /** Namespace URI of XUL Elements */
     export var XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-    export declare var locale: any;
 
     export interface ElemForPrefsWindow extends Element {
         appInfo: AppInfo;

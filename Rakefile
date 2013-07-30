@@ -23,17 +23,21 @@ def setup_filecopy_task(taskname, obj_dir_path_str, src_dir_path_strs)
       dist     = obj_dir + pathname.relative_path_from(src_dir_pathname)
       dist_str = dist.to_s
       if pathname.extname == '.ts'
-        # TODO ts ファイルが参照する外部スクリプトに対する依存関係も考慮する
-        js_filename_str = pathname.basename('.ts').to_s + '.js'
-        src_js = pathname.dirname.join(js_filename_str)
-        dst_js = dist.dirname.join(js_filename_str)
-        file src_js.to_s => [ src_str ] do |t|
-          sh "#{TSC} #{t.prerequisites[0]}"
+        if /\.d\.ts$/ =~ pathname.basename.to_s
+          dist = nil
+        else
+          # TODO ts ファイルが参照する外部スクリプトに対する依存関係も考慮する
+          js_filename_str = pathname.basename('.ts').to_s + '.js'
+          src_js = pathname.dirname.join(js_filename_str)
+          dst_js = dist.dirname.join(js_filename_str)
+          file src_js.to_s => [ src_str ] do |t|
+            sh "#{TSC} #{t.prerequisites[0]}"
+          end
+          file dst_js.to_s => [ dist.dirname.to_s, src_js.to_s ] do |t|
+            cp t.prerequisites[1], t.name
+          end
+          dist = dst_js
         end
-        file dst_js.to_s => [ dist.dirname.to_s, src_js.to_s ] do |t|
-          cp t.prerequisites[1], t.name
-        end
-        dist = dst_js
       elsif check_ts_sourced_js(pathname)
         # do nothing
       elsif pathname.directory?
@@ -43,7 +47,7 @@ def setup_filecopy_task(taskname, obj_dir_path_str, src_dir_path_strs)
           cp src_str, t.name
         end
       end
-      obj_file_path_strs << dist
+      obj_file_path_strs << dist if dist
     end
   end
 

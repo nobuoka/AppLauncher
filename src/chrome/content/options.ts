@@ -1,4 +1,5 @@
 ///<reference path=".\applauncher.ts" />
+///<reference path="..\locale\options.d.ts" />
 // coding: utf-8
 
 interface ChromeWindow extends Window {

@@ -2,6 +2,6 @@
     "name": "applauncher-dev",
     "private": true,
     "dependencies": {
-        "typescript": ">=0.9.0-1"
+        "typescript": ">=0.9.1-1"
     }
 }

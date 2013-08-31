@@ -1,3 +1,4 @@
+///<reference path="..\..\_resource_interface\prefs_change_events.d.ts" />
 ///<reference path="..\locale\applauncher.d.ts" />
 // coding: utf-8
 
@@ -469,30 +470,6 @@ module applauncher {
         }
     }
 
-    /**
-     * Initialize AppLauncher items in context menus on all ChromeWindows.
-     * 全ての ChromeWindow のコンテキストメニュー内にある AppLauncher に関する項目を初期化する
-     */
-    export function initializeContextMenuInAllWindow(): void {
-        try {
-            // 全ての ChromeWindow に対して処理を行う
-            var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
-            var type = null;
-            var enumerator = wm.getEnumerator(type);
-            while ( enumerator.hasMoreElements() ) {
-                var win = enumerator.getNext();
-                // |win| は [Object ChromeWindow] である(|window| と同等)。これに何かをする
-                // コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
-                var menupopup = win.document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
-                if ( menupopup ) {
-                    win.applauncher.initializeContextMenu();
-                }
-            }
-        } catch (e) {
-            window.alert(e);
-        }
-    }
-
     export function cleanupContextMenu(): void {
         try {
             var al = applauncher;
@@ -515,6 +492,13 @@ module applauncher.prefs {
 
     /** AppLauncher の設定保存用 XML が使用する名前空間 */
     var PREFS_NS = "http://www.vividcode.info/firefox_addon/myextensions/applauncher/";
+
+    var m: {
+        prefsChangeEventFactory: applauncher.resource.IPrefsChangeEventFactory;
+    } = {
+        prefsChangeEventFactory: null,
+    };
+    Components.utils.import("resource://applauncher/prefs_change_events.js", m);
 
     export function loadAppInfoList(): AppInfo[] {
         var al = applauncher;
@@ -598,6 +582,8 @@ module applauncher.prefs {
         // cf. https://developer.mozilla.org/ja/XMLSerializer
         var prefStr = new XMLSerializer().serializeToString(prefNode);
         setCharPref("appList", prefStr);
+
+        m.prefsChangeEventFactory.getPrefsChangeEventEmitter().emitEvent("AppInfo");
     }
 
     /**

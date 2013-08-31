@@ -11,6 +11,15 @@ def check_ts_sourced_js(pathname)
   File.exist? pathname.dirname.join(pathname.basename('.js').to_s + '.ts')
 end
 
+# Check whether basename of itself or ancester directories starts with
+# underscore character.
+def include_underscore_name_in_descent?(pathname)
+  pathname.descend do |pathname|
+    return true if /\A_/ =~ pathname.basename.to_s
+  end
+  return false;
+end
+
 # 指定のディレクトリ (複数) の中にあるファイル全てを
 # 別のディレクトリの中にコピーするためのタスクを定義する。
 def setup_filecopy_task(taskname, obj_dir_path_str, src_dir_path_strs)
@@ -22,7 +31,10 @@ def setup_filecopy_task(taskname, obj_dir_path_str, src_dir_path_strs)
       src_str  = pathname.to_s
       dist     = obj_dir + pathname.relative_path_from(src_dir_pathname)
       dist_str = dist.to_s
-      if pathname.extname == '.ts'
+      if include_underscore_name_in_descent?(pathname)
+        # Skip every file or directory whose name starts with underscore character
+        dist = nil
+      elsif pathname.extname == '.ts'
         if /\.d\.ts$/ =~ pathname.basename.to_s
           dist = nil
         else

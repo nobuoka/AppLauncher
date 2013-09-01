@@ -273,7 +273,7 @@ module applauncher {
             file.QueryInterface( Ci.nsILocalFileMac );
             var macFile = <moz.nsILocalFileMac>file;
             if ( macFile.isPackage ) { // `isPackage` is property? (not method?)
-                file = al.getExecuteFileFromMacPackage( macFile );
+                file = getExecuteFileFromMacPackage(macFile);
             }
         }
         // create a nsIProcess object, and run the process
@@ -283,26 +283,18 @@ module applauncher {
                 // if the first arg is true, wait for the process ending
     }
 
-    interface XULMenupopupElement extends Element {
-        triggerNode: Node;
-    }
-
     /**
      * Launch an outer application.
-     * 外部アプリケーションを起動する関数
      */
-    function launchOuterApplication(targetElem: XULMenuitemElementWithAppInfo) {
+    export function launchOuterApplication(appInfo: AppInfo, popupNode: Node) {
         var al = applauncher;
-        var appInfo = targetElem.appInfo;
-        // popupNode の取得: 前者は Fx3.6 以前用, 後者は Fx4.0 以降用 (Fx4.0 以降でも前者で OK の模様)
-        var popupNode = document.popupNode || (<XULMenupopupElement>targetElem.parentNode.parentNode.parentNode).triggerNode;
         try {
             var path = appInfo.path;
             var argsSource = appInfo.args;
             // 設定値の取得
             var argsList = "";
             var args: string[] = [];
-            for( var i = 0; i < argsSource.length; i++ ) {
+            for (var i = 0; i < argsSource.length; i++) {
                 // 文字コード変換とエンティティリファレンスのデコード
                 var uc = Components.classes['@mozilla.org/intl/scriptableunicodeconverter']
                             .getService( Components.interfaces.nsIScriptableUnicodeConverter );
@@ -320,7 +312,7 @@ module applauncher {
                     // 文字コード変換
                     try {
                         uc.charset = match[2];
-                    } catch( err ) {
+                    } catch (err) {
                         throw new Error( al.locale.errorMsg.ENCODING_NOT_SUPPORTED + match[2] );
                     }
                     var tmp = al.decodeEntityReference( match[3], popupNode );
@@ -376,7 +368,7 @@ module applauncher {
      * Get the execution file path from a bundle application file. (for MacOS)
      * @see http://d.hatena.ne.jp/teramako/20110111/p1 (japanese)
      */
-    export function getExecuteFileFromMacPackage(aFile: moz.nsILocalFileMac): moz.nsIFile {
+    function getExecuteFileFromMacPackage(aFile: moz.nsILocalFileMac): moz.nsIFile {
         var infoPlistFile = <moz.nsIFile>aFile.clone().QueryInterface( Ci.nsIFile );
         infoPlistFile.appendRelativePath( "Contents/Info.plist" );
         var ifstream  = Cc["@mozilla.org/network/file-input-stream;1"].createInstance( Ci.nsIFileInputStream );
@@ -397,92 +389,116 @@ module applauncher {
         return exeFile;
     }
 
+}
+
+module applauncher.control {
+
+    import XUL_NS = applauncher.XUL_NS;
+    import IPrefsChangeEventObserver = applauncher.resource.IPrefsChangeEventObserver;
+
+    declare var Components;
+    var m: {
+        prefsChangeEventFactory: applauncher.resource.IPrefsChangeEventFactory;
+    } = {
+        prefsChangeEventFactory: null,
+    };
+    Components.utils.import("resource://applauncher/prefs_change_events.js", m);
+
     interface XULMenuitemElementWithAppInfo extends Element {
         appInfo: AppInfo;
     }
-    function onCmdToLaunchApp(evt: Event): void {
-        try {
-            var targetElem = <XULMenuitemElementWithAppInfo>evt.currentTarget;
-            launchOuterApplication(targetElem);
-        } catch (e) {
-            window.alert(e);
-        }
-    }
-    function createContextMenuItem(appInfo: AppInfo): Element {
-        var al = applauncher;
-        // "menuitem" 要素の作成
-        var item = <XULMenuitemElementWithAppInfo>document.createElementNS( al.XUL_NS, "menuitem" );
-        item.setAttribute("label", appInfo.name);
-        // イベントリスナの追加
-        item.appInfo = appInfo;
-        item.addEventListener("command", onCmdToLaunchApp, false);
-        return item;
-    }
-    function destroyContextMenuItem(item: Element): void {
-        var al = applauncher;
-        if ((<any>item).appInfo) delete (<any>item).appInfo;
-        item.removeEventListener("command", onCmdToLaunchApp, false);
-    }
-    export function onCmdToOpenPrefWindow( evt ) {
-        // 設定ウィンドウを表示
-        window.open( "chrome://applauncher/content/options.xul", "applauncherprefs", "chrome,dialog,resizable=yes" );
+
+    interface XULMenupopupElement extends Element {
+        triggerNode: Node;
     }
 
-    /**
-     * Initialize an AppLauncher item in the context menu.
-     * コンテキストメニューの初期化を行う関数
-     */
-    export function initializeContextMenu(): void {
-        try {
+    function onCmdToLaunchApp(evt: Event): void {
+        var targetElem = <XULMenuitemElementWithAppInfo>evt.currentTarget;
+        var appInfo = targetElem.appInfo;
+        // popupNode の取得: 前者は Fx3.6 以前用, 後者は Fx4.0 以降用 (Fx4.0 以降でも前者で OK の模様)
+        var popupNode = document.popupNode || (<XULMenupopupElement>targetElem.parentNode.parentNode.parentNode).triggerNode;
+        applauncher.launchOuterApplication(appInfo, popupNode);
+    }
+
+    function onCmdToOpenPrefWindow(evt: Event) {
+        // 設定ウィンドウを表示
+        window.open("chrome://applauncher/content/options.xul",
+                "applauncherprefs", "chrome,dialog,resizable=yes");
+    }
+
+    export class AppLauncherContextMenu {
+        private element: Element;
+        private _menupopupElem: Element;
+        private _prefsChangeEventObserver: IPrefsChangeEventObserver;
+
+        constructor(menuElem: Element) {
+            this.element = menuElem;
+            this._menupopupElem = <Element>menuElem.getElementsByTagNameNS(XUL_NS, "menupopup").item(0);
+            this._setupMenupopup();
+
+            this._prefsChangeEventObserver = m.prefsChangeEventFactory.createPrefsChangeEventObserver("AppInfo", () => {
+                this._setupMenupopup();
+            });
+            this._prefsChangeEventObserver.start();
+        }
+
+        destroy(): void {
+            this._prefsChangeEventObserver.stop();
+            this._cleanupMenupopup();
+        }
+
+        private _setupMenupopup() {
             var al = applauncher;
-            // 設定の読み込み
+            var menupopup = this._menupopupElem;
             var appInfoList: AppInfo[] = al.prefs.loadAppInfoList();
-            // コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
-            var menupopup = document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
-            if ( menupopup ) {
-                // もともとある要素を削除
-                while ( menupopup.hasChildNodes() ) {
-                    menupopup.removeChild( menupopup.firstChild );
-                }
-                // 要素を追加
-                if ( appInfoList != null && appInfoList.length != 0 ) {
-                    for (var i = 0; i < appInfoList.length; ++i) {
-                        menupopup.appendChild( createContextMenuItem(appInfoList[i]) );
-                    }
-                } else {
-                    // 設定項目が存在しないときのメッセージを追加
-                    var item = document.createElementNS( al.XUL_NS, "menuitem" );
-                    item.setAttribute( "label", al.locale.contextMenu.NON_PREF_MSG );
-                    menupopup.appendChild(item);
-                }
-                // "menuseparator" 要素を追加
-                menupopup.appendChild( document.createElementNS( al.XUL_NS, "menuseparator" ) );
-                // 設定画面を起動する要素を追加
-                // "menuitem" 要素の作成
-                var item = document.createElementNS( al.XUL_NS, "menuitem" );
-                item.setAttribute( "label", al.locale.contextMenu.PREFERENCES );
-                item.addEventListener( "command", al.onCmdToOpenPrefWindow, false );
-                // "menupopup" 要素の子ノードに追加
+            this._cleanupMenupopup();
+
+            if (appInfoList && appInfoList.length !== 0) {
+                // `menuitem` elements to launch outer application
+                appInfoList.forEach(appInfo => {
+                    menupopup.appendChild(this._createContextMenuItem(appInfo));
+                });
+            } else {
+                // `menuitem` element to tell there is no launcher setting
+                var item = this._createMenuitemElem(al.locale.contextMenu.NON_PREF_MSG);
                 menupopup.appendChild(item);
             }
-        } catch (e) {
-            window.alert(e);
+            // `menuseparator` element
+            menupopup.appendChild(document.createElementNS(XUL_NS, "menuseparator"));
+            // `menuitem` element to open prefs window
+            var item = this._createMenuitemElem(al.locale.contextMenu.PREFERENCES);
+            item.addEventListener("command", onCmdToOpenPrefWindow, false);
+            menupopup.appendChild(item);
         }
-    }
 
-    export function cleanupContextMenu(): void {
-        try {
-            var al = applauncher;
-            // コンテキストメニュー内の、AppLauncher に関する "menupopup" 要素 (id で指定) を取得
-            var menupopup = document.getElementById( "info.vividcode.applauncher.contextmenu.items" );
-            if ( menupopup ) {
-                var items = <NodeListOf<Element>>menupopup.getElementsByTagNameNS(al.XUL_NS, "menuitem");
-                for (var i = 0; i < items.length - 1; ++i) {
-                    destroyContextMenuItem( items.item(i) );
-                }
+        private _cleanupMenupopup() {
+            var menupopup = this._menupopupElem;
+            var items = <NodeListOf<Element>>menupopup.getElementsByTagNameNS(XUL_NS, "menuitem");
+            for (var i = 0; i < items.length - 1; ++i) {
+                this._cleanupContextMenuItem(<XULMenuitemElementWithAppInfo>items.item(i));
             }
-        } catch (e) {
-            window.alert(e);
+            while (menupopup.hasChildNodes()) {
+                menupopup.removeChild(menupopup.firstChild);
+            }
+        }
+
+        private _createMenuitemElem(labelValue: string): Element {
+            var elem = document.createElementNS(XUL_NS, "menuitem");
+            elem.setAttribute("label", labelValue);
+            return elem;
+        }
+
+        private _createContextMenuItem(appInfo: AppInfo): Element {
+            var item = <XULMenuitemElementWithAppInfo>document.createElementNS(XUL_NS, "menuitem");
+            item.setAttribute("label", appInfo.name);
+            item.appInfo = appInfo;
+            item.addEventListener("command", onCmdToLaunchApp, false);
+            return item;
+        }
+
+        private _cleanupContextMenuItem(item: XULMenuitemElementWithAppInfo): void {
+            if (item.appInfo) delete item.appInfo;
+            item.removeEventListener("command", onCmdToLaunchApp, false);
         }
     }
 }

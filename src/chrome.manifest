@@ -13,7 +13,7 @@ content   applauncher                 chrome/content/
 skin      applauncher   classic/1.0   chrome/skin/
 locale    applauncher   en-US         chrome/locale/en-US/
 locale    applauncher   ja            chrome/locale/ja/
-#resource  applauncher                 chrome/js_module/
+resource  applauncher                 resource/
 
 # 他のパッケージのオーバーレイ
 overlay   chrome://browser/content/browser.xul   chrome://applauncher/content/ff-overlay.xul

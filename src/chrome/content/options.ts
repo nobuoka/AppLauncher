@@ -203,8 +203,6 @@ module applauncher {
                     appInfoList.push( elems.item(i).appInfo );
                 }
                 al.prefs.saveAppInfoList( appInfoList );
-                // コンテキストメニューを初期化する
-                al.initializeContextMenuInAllWindow();
             } catch (e) {
                 this._win.alert(e);
             }

@@ -1,0 +1,21 @@
+{
+    "manifest_version": 2,
+    "name": "AppLauncher",
+    "version": "1.0",
+    "description": "This is AppLauncher!",
+    "homepage_url": "https://github.com/nobuoka/AppLauncher",
+    "icons": {
+      "32": "icons/icon_32x32.png"
+    },
+    
+    "permissions": [
+        "contextMenus"
+    ],
+  
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["applauncher.js"]
+      }
+    ]
+}
